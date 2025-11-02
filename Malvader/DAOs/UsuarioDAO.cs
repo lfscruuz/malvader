@@ -11,7 +11,30 @@ namespace Malvader.DAO
         {
             _connectionFactory = connectionFactory;
         }
+        public Usuario Inserir(Usuario usuario)
+        {
+            using var conn = _connectionFactory.CreateConnection();
+            conn.Open();
 
+            string sql = @"
+                INSERT INTO usuario (nome, cpf, data_nascimento, telefone, tipo_usuario, senha_hash)
+                VALUES (@nome, @cpf, @dataNascimento, @telefone, @tipoUsuario, @senhaHash);
+                SELECT LAST_INSERT_ID();
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@nome", usuario.Nome);
+            cmd.Parameters.AddWithValue("@cpf", usuario.CPF);
+            cmd.Parameters.AddWithValue("@dataNascimento", usuario.DataNascimento);
+            cmd.Parameters.AddWithValue("@telefone", usuario.Telefone);
+            cmd.Parameters.AddWithValue("@tipoUsuario", usuario.Tipo.ToString());
+            cmd.Parameters.AddWithValue("@senhaHash", usuario.SenhaHash);
+
+            var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
+            usuario.Id = insertedId;
+
+            return usuario;
+        }
         public List<Usuario> ListarTodos()
         {
             var usuarios = new List<Usuario>();

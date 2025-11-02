@@ -1,4 +1,5 @@
 using Malvader.DAO;
+using Malvader.DAOs;
 using Malvader.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton(new DbConnectionFactory(connectionString));
 builder.Services.AddScoped<UsuarioDAO>();
+builder.Services.AddScoped<ClienteDAO>();
 
 var app = builder.Build();
 
