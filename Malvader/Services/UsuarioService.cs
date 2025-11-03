@@ -2,55 +2,23 @@
 using Malvader.DAOs;
 using Malvader.DTOs;
 using Malvader.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Malvader.Controllers
+namespace Malvader.Services
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UsuarioController : ControllerBase
+    public class UsuarioService
     {
         private readonly UsuarioDAO _usuarioDao;
         private readonly ClienteDAO _clienteDao;
 
-        public UsuarioController(UsuarioDAO usuarioDao, ClienteDAO clienteDao)
+        public UsuarioService(UsuarioDAO usuarioDao, ClienteDAO clienteDao)
         {
             _usuarioDao = usuarioDao;
             _clienteDao = clienteDao;
         }
 
-        [HttpGet]
-        public ActionResult<List<Usuario>> GetAllUsuarios()
-        {
-            var usuarios = _usuarioDao.ListarTodos();
-            return Ok(usuarios);
-        }
-        [HttpPost("cliente")]
-        public ActionResult CriarCliente([FromBody] CreateClienteRequestDTO requestDto)
-        {
-            var errors = new List<string>();
-            var (usuario, errorResponse) = CriarUsuario(requestDto, errors);
-            if (usuario == null) return BadRequest(errorResponse);
-
-            (var cliente, errorResponse) = CriarCliente(requestDto, usuario, errors);
-            if (cliente == null) return BadRequest(errorResponse);
-
-            var responseDto = new CreateClienteResponseDTO
-            {
-                Id = cliente.Id,
-                Nome = cliente.Usuario.Nome,
-                Cpf = cliente.Usuario.CPF,
-                Success = true,
-                Message = "cliente criado com sucesso!",
-                UsuarioId = cliente.Usuario.Id
-            };
-
-            return Ok(responseDto);
-        }
-
-        private (Usuario? usuario, ErrorResponse? errorResponse) CriarUsuario(CreateUsuarioRequestDTO requestDTO, List<string> errors)
+        public (Usuario? usuario, ErrorResponse? errorResponse) CriarUsuario(
+            CreateUsuarioRequestDTO requestDTO,
+            List<string> errors)
         {
             if (string.IsNullOrEmpty(requestDTO.Nome))
             {
@@ -95,12 +63,12 @@ namespace Malvader.Controllers
             novoUsuario = _usuarioDao.Inserir(novoUsuario);
             return (novoUsuario, null);
         }
-        private (Cliente? cliente, ErrorResponse? errorResponse) CriarCliente(
+        public (Cliente? cliente, ErrorResponse? errorResponse) CriarCliente(
             CreateClienteRequestDTO requestDto,
             Usuario? usuario,
             List<string> errors)
         {
-            if (string.IsNullOrEmpty(usuario.Id.ToString()))
+            if (string.IsNullOrEmpty(usuario?.Id.ToString()))
             {
                 errors.Add("Insira o id do usuário");
             }
@@ -122,6 +90,35 @@ namespace Malvader.Controllers
             };
             novoCliente = _clienteDao.Inserir(novoCliente);
             return (novoCliente, null);
+        }
+
+        public (Funcionario? funcionario, ErrorResponse? errorResponse) CriarFuncionario(
+            CreateFuncionarioRequestDTO requestDto,
+            Usuario? usuario,
+            List<string> errors)
+        {
+            if (string.IsNullOrEmpty(usuario?.Id.ToString()))
+            {
+                errors.Add("Insira o id do usuário");
+            }
+            if (string.IsNullOrEmpty(requestDto.Agencia.ToString()))
+            {
+                errors.Add("Insira o id da agencia");
+            }
+
+            if (errors.Any() || usuario == null)
+            {
+                var errorResponse = new ErrorResponse { Errors = errors };
+                return (null, errorResponse);
+            }
+
+            var novoFuncionario = new Funcionario
+            {
+                Usuario = usuario,
+                
+            };
+
+            return (novoFuncionario, null);
         }
     }
 }

@@ -7,12 +7,10 @@ namespace Malvader.DAOs
     public class ClienteDAO
     {
         private readonly DbConnectionFactory _connectionFactory;
-        private readonly UsuarioDAO _usuarioDao;
 
-        public ClienteDAO(DbConnectionFactory connectionFactory, UsuarioDAO suarioDao)
+        public ClienteDAO(DbConnectionFactory connectionFactory, UsuarioDAO usarioDao)
         {
             _connectionFactory = connectionFactory;
-            _usuarioDao = suarioDao;
         }
 
         public Cliente Inserir(Cliente cliente) 
