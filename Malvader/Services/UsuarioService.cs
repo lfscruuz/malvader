@@ -9,11 +9,13 @@ namespace Malvader.Services
     {
         private readonly UsuarioDAO _usuarioDao;
         private readonly ClienteDAO _clienteDao;
+        private readonly FuncionarioDAO _funcionarioDao;
 
-        public UsuarioService(UsuarioDAO usuarioDao, ClienteDAO clienteDao)
+        public UsuarioService(UsuarioDAO usuarioDao, ClienteDAO clienteDao, FuncionarioDAO funcionario)
         {
             _usuarioDao = usuarioDao;
             _clienteDao = clienteDao;
+            _funcionarioDao = funcionario;
         }
 
         public (Usuario? usuario, ErrorResponse? errorResponse) CriarUsuario(
@@ -115,8 +117,12 @@ namespace Malvader.Services
             var novoFuncionario = new Funcionario
             {
                 Usuario = usuario,
-                
+                Agencia = requestDto.Agencia,
+                Cargo = requestDto.Cargo,
+                Supervisor = requestDto.Supervisor
             };
+
+            _funcionarioDao.Inserir(novoFuncionario);
 
             return (novoFuncionario, null);
         }

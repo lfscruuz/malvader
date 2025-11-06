@@ -2,7 +2,6 @@
 using Malvader.DAOs;
 using Malvader.DTOs;
 using Malvader.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Malvader.Controllers
@@ -12,19 +11,19 @@ namespace Malvader.Controllers
     public class FuncionarioController : ControllerBase
     {
         private readonly UsuarioDAO _usuarioDao;
-        private readonly ClienteDAO _clienteDao;
+        private readonly FuncionarioDAO _funcionarioDao;
         private readonly UsuarioService _usuarioService;
 
-        public FuncionarioController(UsuarioDAO usuarioDao, ClienteDAO clienteDao, UsuarioService usuarioService)
+        public FuncionarioController(UsuarioDAO usuarioDao, UsuarioService usuarioService, FuncionarioDAO funcionarioDao)
         {
             _usuarioDao = usuarioDao;
-            _clienteDao = clienteDao;
             _usuarioService = usuarioService;
+            _funcionarioDao = funcionarioDao;
         }
 
 
         [HttpPost("Cliente")]
-        public ActionResult CriarFuncionario([FromBody] CreateClienteRequestDTO requestDto)
+        public ActionResult CriarFuncionario([FromBody] CreateFuncionarioRequestDTO requestDto)
         {
             /*{
                 "nome": "luis",
@@ -39,17 +38,17 @@ namespace Malvader.Controllers
             var (usuario, errorResponse) = _usuarioService.CriarUsuario(requestDto, errors);
             if (usuario == null) return BadRequest(errorResponse);
 
-            (var cliente, errorResponse) = _usuarioService.CriarCliente(requestDto, usuario, errors);
-            if (cliente == null) return BadRequest(errorResponse);
+            (var funcionario, errorResponse) = _usuarioService.CriarFuncionario(requestDto, usuario, errors);
+            if (funcionario == null) return BadRequest(errorResponse);
 
             var responseDto = new CreateClienteResponseDTO
             {
-                Id = cliente.Id,
-                Nome = cliente.Usuario.Nome,
-                Cpf = cliente.Usuario.CPF,
+                Id = funcionario.Id,
+                Nome = funcionario.Usuario.Nome,
+                Cpf = funcionario.Usuario.CPF,
                 Success = true,
                 Message = "cliente criado com sucesso!",
-                UsuarioId = cliente.Usuario.Id
+                UsuarioId = funcionario.Usuario.Id
             };
 
             return Ok(responseDto);

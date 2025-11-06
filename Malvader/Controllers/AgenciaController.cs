@@ -1,7 +1,5 @@
 ﻿using Malvader.DTOs;
-using Malvader.Models;
 using Malvader.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Malvader.Controllers
@@ -20,6 +18,17 @@ namespace Malvader.Controllers
         [HttpPost]
         public IActionResult NovaAgencia([FromBody] CreateAgenciaRequestDTO requestDTO)
         {
+            /*{
+                "nome": "sjaalksj",
+                "codigoAgencia": "string",
+                "cep": "71929720",
+                "local": "local1",
+                "numero": 42,
+                "bairro": "bairro1",
+                "cidade": "brasilia",
+                "estado": "DF",
+                "complemento": "complemento1"
+            }*/
             var errors = new List<string>();
             var (novaAgencia, errorResponse) = _agenciaService.CriarAgencia(requestDTO, errors);
             if (errorResponse != null) {
