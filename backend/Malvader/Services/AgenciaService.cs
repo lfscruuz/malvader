@@ -15,12 +15,12 @@ namespace Malvader.Services
             _enderecoAgenciaDao = enderecoAgenciaDao;
         }
 
-        public (Agencia? agencia, ErrorResponse? errorResponse) CriarAgencia(CreateAgenciaRequestDTO requestDto, List<string> errors)
+        public (Agencia? agencia, EnderecoAgencia? endereco, ErrorResponse? errorResponse) CriarAgencia(CreateAgenciaRequestDTO requestDto, List<string> errors)
         {
             var (enderecoAgencia, errorResponse) = CriarEnderecoAgencia(requestDto, errors);
             if (enderecoAgencia == null)
             {
-                return (null, errorResponse);
+                return (null, null, errorResponse);
             }
 
             if (string.IsNullOrEmpty(requestDto.Nome))
@@ -30,17 +30,17 @@ namespace Malvader.Services
             if (errors.Any())
             {
                 errorResponse = new ErrorResponse { Errors = errors };
-                return (null, errorResponse);
+                return (null, null, errorResponse);
             }
             var novaAgencia = new Agencia
             {
                 Nome = requestDto.Nome,
                 CodigoAgencia = requestDto.CodigoAgencia,
-                EnderecoAgencia = enderecoAgencia,
+                EnderecoAgenciaId = enderecoAgencia.Id,
             };
 
             novaAgencia = _agenciaDao.Insert(novaAgencia);
-            return (novaAgencia, null);
+            return (novaAgencia, enderecoAgencia, null);
         }
 
         #region Private Methods

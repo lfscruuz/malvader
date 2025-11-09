@@ -3,16 +3,16 @@ using MySql.Data.MySqlClient;
 
 namespace Malvader.DAOs
 {
-    public class AgenciaDAO
+    public class ContaDAO
     {
         private readonly DbConnectionFactory _dbConnectionFactory;
 
-        public AgenciaDAO(DbConnectionFactory dbConnectionFactory)
+        public ContaDAO(DbConnectionFactory dbConnectionFactory)
         {
             _dbConnectionFactory = dbConnectionFactory;
         }
 
-        public Agencia Insert(Agencia agencia)
+        public Conta Insert(Agencia agencia)
         {
             using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
@@ -26,7 +26,7 @@ namespace Malvader.DAOs
             using var cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@nome", agencia.Nome);
             cmd.Parameters.AddWithValue("@codigoAgencia", agencia.CodigoAgencia);
-            cmd.Parameters.AddWithValue("@enderecoId", agencia.EnderecoAgenciaId);
+            cmd.Parameters.AddWithValue("@enderecoId", agencia.EnderecoAgencia.Id);
 
             var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
             agencia.Id = insertedId;

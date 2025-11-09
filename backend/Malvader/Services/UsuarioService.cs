@@ -1,7 +1,6 @@
 ﻿using Malvader.DAO;
 using Malvader.DAOs;
 using Malvader.DTOs.RequestDTOs.Create;
-using Malvader.DTOs.ResponseDTOs.Create;
 using Malvader.Models;
 
 namespace Malvader.Services
@@ -19,7 +18,7 @@ namespace Malvader.Services
             _funcionarioDao = funcionario;
         }
         #region Public Methods
-        public (Cliente? cliente, Usuario usuario, ErrorResponse? errorResponse) CriarCliente(
+        public (Cliente? cliente, Usuario? usuario, ErrorResponse? errorResponse) CriarCliente(
             CreateClienteRequestDTO requestDto,
             List<string> errors)
         {
@@ -43,14 +42,14 @@ namespace Malvader.Services
 
             var novoCliente = new Cliente
             {
-                Usuario = usuario,
+                UsuarioId = usuario.Id,
                 ScoreCredito = requestDto.ScoreCredito != 0 ? requestDto.ScoreCredito : 0,
             };
             novoCliente = _clienteDao.Inserir(novoCliente);
             return (novoCliente, usuario, null);
         }
 
-        public (Funcionario? funcionario, Usuario usuario, ErrorResponse? errorResponse) CriarFuncionario(
+        public (Funcionario? funcionario, Usuario? usuario, ErrorResponse? errorResponse) CriarFuncionario(
             CreateFuncionarioRequestDTO requestDto,
             List<string> errors)
         {
@@ -74,10 +73,10 @@ namespace Malvader.Services
 
             var novoFuncionario = new Funcionario
             {
-                Usuario = usuario,
-                Agencia = requestDto.Agencia,
+                UsuarioId = usuario.Id,
+                AgenciaId = requestDto.Agencia.Id,
                 Cargo = requestDto.Cargo,
-                Supervisor = requestDto.Supervisor
+                SupervisorId = requestDto.Supervisor.Id
             };
 
             novoFuncionario = _funcionarioDao.Inserir(novoFuncionario);

@@ -1,4 +1,5 @@
 ﻿using Malvader.DTOs.RequestDTOs.Create;
+using Malvader.DTOs.ResponseDTOs.Create;
 using Malvader.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,11 +31,24 @@ namespace Malvader.Controllers
                 "complemento": "complemento1"
             }*/
             var errors = new List<string>();
-            var (novaAgencia, errorResponse) = _agenciaService.CriarAgencia(requestDTO, errors);
+            var (agencia, endereco, errorResponse) = _agenciaService.CriarAgencia(requestDTO, errors);
             if (errorResponse != null) {
                 return BadRequest(errorResponse);
             }
-            return Ok(novaAgencia);
+            var agenciaResponseDto = new CreateAgenciaResponseDTO
+            {
+                Id = agencia.Id,
+                Nome = agencia.Nome,
+                CodigoAgencia = agencia.CodigoAgencia,
+                Cep = endereco.Cep,
+                Local = endereco.Local,
+                Numero = endereco.Numero,
+                Bairro = endereco.Bairro,
+                Cidade = endereco.Cidade,
+                Estado = endereco.Estado,
+                Complemento = endereco.Complemento,
+            };
+            return Ok(agenciaResponseDto);
         }
     }
 }

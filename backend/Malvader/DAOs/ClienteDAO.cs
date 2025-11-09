@@ -25,7 +25,7 @@ namespace Malvader.DAOs
             ";
 
             using var cmd = new MySqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@usuarioId", cliente.Usuario.Id);
+            cmd.Parameters.AddWithValue("@usuarioId", cliente.UsuarioId);
             cmd.Parameters.AddWithValue("@scoreCredito", cliente.ScoreCredito);
 
             var insertedId = Convert.ToInt32(cmd.ExecuteScalar());

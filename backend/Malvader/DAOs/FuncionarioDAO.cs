@@ -25,11 +25,11 @@ namespace Malvader.DAOs
             ";
 
             using var cmd = new MySqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@usuarioId", funcionario.Usuario.Id);
-            cmd.Parameters.AddWithValue("@agenciaId", funcionario.Agencia.Id);
+            cmd.Parameters.AddWithValue("@usuarioId", funcionario.UsuarioId);
+            cmd.Parameters.AddWithValue("@agenciaId", funcionario.AgenciaId);
             cmd.Parameters.AddWithValue("@codigoFuncionario", funcionario.CodigoFuncionario);
             cmd.Parameters.AddWithValue("@cargo", funcionario.Cargo.ToString());
-            cmd.Parameters.AddWithValue("@supervisorId", funcionario.Supervisor.Id);
+            cmd.Parameters.AddWithValue("@supervisorId", funcionario.UsuarioId);
 
             var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
             funcionario.Id = insertedId;

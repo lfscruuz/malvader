@@ -10,10 +10,10 @@
     public class Funcionario
     {
         public int Id { get; set; }
-        public required Usuario Usuario { get; set; }
-        public required Agencia Agencia { get; set; }
+        public int UsuarioId { get; set; }
+        public int AgenciaId { get; set; }
         public string? CodigoFuncionario { get; set; }
         public Cargo Cargo { get; set; }
-        public Funcionario? Supervisor { get; set; }
+        public int SupervisorId { get; set; }
     }
 }
