@@ -1,6 +1,7 @@
 ﻿using Malvader.DAO;
 using Malvader.DAOs;
-using Malvader.DTOs;
+using Malvader.DTOs.RequestDTOs.Create;
+using Malvader.DTOs.ResponseDTOs.Create;
 using Malvader.Models;
 
 namespace Malvader.Services
@@ -17,10 +18,77 @@ namespace Malvader.Services
             _clienteDao = clienteDao;
             _funcionarioDao = funcionario;
         }
-
-        public (Usuario? usuario, ErrorResponse? errorResponse) CriarUsuario(
-            CreateUsuarioRequestDTO requestDTO,
+        #region Public Methods
+        public (Cliente? cliente, Usuario usuario, ErrorResponse? errorResponse) CriarCliente(
+            CreateClienteRequestDTO requestDto,
             List<string> errors)
+        {
+            var (usuario, errorResponse) = CriarUsuario(requestDto, errors);
+            if (usuario == null) return (null, null, new ErrorResponse { Errors = errors });
+
+            if (string.IsNullOrEmpty(usuario?.Id.ToString()))
+            {
+                errors.Add("Insira o id do usuário");
+            }
+            if (string.IsNullOrEmpty(requestDto.ScoreCredito.ToString()))
+            {
+                errors.Add("Insira o score");
+            }
+
+            if (errors.Any())
+            {
+                errorResponse = new ErrorResponse { Errors = errors };
+                return (null, null, errorResponse);
+            }
+
+            var novoCliente = new Cliente
+            {
+                Usuario = usuario,
+                ScoreCredito = requestDto.ScoreCredito != 0 ? requestDto.ScoreCredito : 0,
+            };
+            novoCliente = _clienteDao.Inserir(novoCliente);
+            return (novoCliente, usuario, null);
+        }
+
+        public (Funcionario? funcionario, Usuario usuario, ErrorResponse? errorResponse) CriarFuncionario(
+            CreateFuncionarioRequestDTO requestDto,
+            List<string> errors)
+        {
+            var (usuario, errorResponse) = CriarUsuario(requestDto, errors);
+            if (usuario == null) return (null, null, new ErrorResponse { Errors = errors });
+
+            if (string.IsNullOrEmpty(usuario?.Id.ToString()))
+            {
+                errors.Add("Insira o id do usuário");
+            }
+            if (string.IsNullOrEmpty(requestDto.Agencia.ToString()))
+            {
+                errors.Add("Insira o id da agencia");
+            }
+
+            if (errors.Any() || usuario == null)
+            {
+                errorResponse = new ErrorResponse { Errors = errors };
+                return (null, null, errorResponse);
+            }
+
+            var novoFuncionario = new Funcionario
+            {
+                Usuario = usuario,
+                Agencia = requestDto.Agencia,
+                Cargo = requestDto.Cargo,
+                Supervisor = requestDto.Supervisor
+            };
+
+            novoFuncionario = _funcionarioDao.Inserir(novoFuncionario);
+            return (novoFuncionario, usuario, null);
+        }
+        #endregion
+
+        #region Private Methods
+        private (Usuario? usuario, ErrorResponse? errorResponse) CriarUsuario(
+           CreateUsuarioRequestDTO requestDTO,
+           List<string> errors)
         {
             if (string.IsNullOrEmpty(requestDTO.Nome))
             {
@@ -65,66 +133,7 @@ namespace Malvader.Services
             novoUsuario = _usuarioDao.Inserir(novoUsuario);
             return (novoUsuario, null);
         }
-        public (Cliente? cliente, ErrorResponse? errorResponse) CriarCliente(
-            CreateClienteRequestDTO requestDto,
-            Usuario? usuario,
-            List<string> errors)
-        {
-            if (string.IsNullOrEmpty(usuario?.Id.ToString()))
-            {
-                errors.Add("Insira o id do usuário");
-            }
-            if (string.IsNullOrEmpty(requestDto.ScoreCredito.ToString()))
-            {
-                errors.Add("Insira o score");
-            }
 
-            if (errors.Any() || usuario == null)
-            {
-                var errorResponse = new ErrorResponse { Errors = errors };
-                return (null, errorResponse);
-            }
-
-            var novoCliente = new Cliente
-            {
-                Usuario = usuario,
-                ScoreCredito = requestDto.ScoreCredito != 0 ? requestDto.ScoreCredito : 0,
-            };
-            novoCliente = _clienteDao.Inserir(novoCliente);
-            return (novoCliente, null);
-        }
-
-        public (Funcionario? funcionario, ErrorResponse? errorResponse) CriarFuncionario(
-            CreateFuncionarioRequestDTO requestDto,
-            Usuario? usuario,
-            List<string> errors)
-        {
-            if (string.IsNullOrEmpty(usuario?.Id.ToString()))
-            {
-                errors.Add("Insira o id do usuário");
-            }
-            if (string.IsNullOrEmpty(requestDto.Agencia.ToString()))
-            {
-                errors.Add("Insira o id da agencia");
-            }
-
-            if (errors.Any() || usuario == null)
-            {
-                var errorResponse = new ErrorResponse { Errors = errors };
-                return (null, errorResponse);
-            }
-
-            var novoFuncionario = new Funcionario
-            {
-                Usuario = usuario,
-                Agencia = requestDto.Agencia,
-                Cargo = requestDto.Cargo,
-                Supervisor = requestDto.Supervisor
-            };
-
-            _funcionarioDao.Inserir(novoFuncionario);
-
-            return (novoFuncionario, null);
-        }
+        #endregion
     }
 }

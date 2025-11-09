@@ -1,15 +1,14 @@
 ﻿using Malvader.DAO;
 using Malvader.DAOs;
-using Malvader.DTOs;
+using Malvader.DTOs.RequestDTOs.Create;
+using Malvader.DTOs.ResponseDTOs.Create;
 using Malvader.Models;
 using Malvader.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Malvader.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/usuario")]
     [ApiController]
     public class ClienteCOntroller : ControllerBase
     {
@@ -24,7 +23,7 @@ namespace Malvader.Controllers
             _usuarioService = usuarioService;
         }
 
-        [HttpPost("Cliente")]
+        [HttpPost("cliente")]
         public ActionResult NovoCliente([FromBody] CreateClienteRequestDTO requestDto)
         {
         /*{
@@ -37,23 +36,26 @@ namespace Malvader.Controllers
               "scoreCredito": 0
         }*/
             var errors = new List<string>();
-            var (usuario, errorResponse) = _usuarioService.CriarUsuario(requestDto, errors);
-            if (usuario == null) return BadRequest(errorResponse);
-
-            (var cliente, errorResponse) = _usuarioService.CriarCliente(requestDto, usuario, errors);
+            var (cliente, usuario, errorResponse) = _usuarioService.CriarCliente(requestDto, errors);
             if (cliente == null) return BadRequest(errorResponse);
 
-            var responseDto = new CreateClienteResponseDTO
+            var usuarioResponseDto = new CreateUsuarioResponseDTO
+            {
+                Nome = usuario.Nome,
+                CPF = usuario.CPF,
+                DataNascimento = usuario.DataNascimento,
+                Telefone = usuario.Telefone,
+                TipoUsuario = usuario.Tipo
+            };
+            var clienteResponseDto = new CreateFuncionarioResponseDTO
             {
                 Id = cliente.Id,
-                Nome = cliente.Usuario.Nome,
-                Cpf = cliente.Usuario.CPF,
                 Success = true,
-                Message = "cliente criado com sucesso!",
-                UsuarioId = cliente.Usuario.Id
+                Message = "Funcionário criado com sucesso!",
+                Usuario = usuarioResponseDto
             };
 
-            return Ok(responseDto);
+            return Ok(clienteResponseDto);
         }
     }
 }

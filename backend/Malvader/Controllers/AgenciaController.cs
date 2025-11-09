@@ -1,4 +1,4 @@
-﻿using Malvader.DTOs;
+﻿using Malvader.DTOs.RequestDTOs.Create;
 using Malvader.Services;
 using Microsoft.AspNetCore.Mvc;
 

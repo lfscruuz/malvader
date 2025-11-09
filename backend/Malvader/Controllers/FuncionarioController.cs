@@ -1,29 +1,26 @@
 ﻿using Malvader.DAO;
 using Malvader.DAOs;
-using Malvader.DTOs;
+using Malvader.DTOs.RequestDTOs.Create;
+using Malvader.DTOs.ResponseDTOs.Create;
 using Malvader.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Malvader.Controllers
 {
-    [Route("api/usuario/funcionario")]
+    [Route("api/usuario")]
     [ApiController]
     public class FuncionarioController : ControllerBase
     {
-        private readonly UsuarioDAO _usuarioDao;
-        private readonly FuncionarioDAO _funcionarioDao;
         private readonly UsuarioService _usuarioService;
 
-        public FuncionarioController(UsuarioDAO usuarioDao, UsuarioService usuarioService, FuncionarioDAO funcionarioDao)
+        public FuncionarioController(UsuarioService usuarioService)
         {
-            _usuarioDao = usuarioDao;
             _usuarioService = usuarioService;
-            _funcionarioDao = funcionarioDao;
         }
 
 
-        [HttpPost("Cliente")]
-        public ActionResult CriarFuncionario([FromBody] CreateFuncionarioRequestDTO requestDto)
+        [HttpPost("funcionario")]
+        public ActionResult InserirFuncionario([FromBody] CreateFuncionarioRequestDTO requestDto)
         {
             /*{
                 "nome": "luis",
@@ -35,23 +32,26 @@ namespace Malvader.Controllers
                   "scoreCredito": 0
             }*/
             var errors = new List<string>();
-            var (usuario, errorResponse) = _usuarioService.CriarUsuario(requestDto, errors);
-            if (usuario == null) return BadRequest(errorResponse);
-
-            (var funcionario, errorResponse) = _usuarioService.CriarFuncionario(requestDto, usuario, errors);
+            var (funcionario, usuario, errorResponse) = _usuarioService.CriarFuncionario(requestDto, errors);
             if (funcionario == null) return BadRequest(errorResponse);
 
-            var responseDto = new CreateClienteResponseDTO
+            var usuarioResponseDto = new CreateUsuarioResponseDTO
+            {
+                Nome = usuario.Nome,
+                CPF = usuario.CPF,
+                DataNascimento = usuario.DataNascimento,
+                Telefone = usuario.Telefone,
+                TipoUsuario = usuario.Tipo
+            };
+            var funcionarioResponseDto = new CreateFuncionarioResponseDTO
             {
                 Id = funcionario.Id,
-                Nome = funcionario.Usuario.Nome,
-                Cpf = funcionario.Usuario.CPF,
                 Success = true,
-                Message = "cliente criado com sucesso!",
-                UsuarioId = funcionario.Usuario.Id
+                Message = "Cliente criado com sucesso!",
+                Usuario = usuarioResponseDto
             };
 
-            return Ok(responseDto);
+            return Ok(funcionarioResponseDto);
         }
 
     }

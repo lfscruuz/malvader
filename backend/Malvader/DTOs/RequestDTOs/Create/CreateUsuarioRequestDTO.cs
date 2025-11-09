@@ -1,4 +1,4 @@
-﻿namespace Malvader.DTOs
+﻿namespace Malvader.DTOs.RequestDTOs.Create
 {
     public class CreateUsuarioRequestDTO
     {

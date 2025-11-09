@@ -1,5 +1,5 @@
 ﻿using Malvader.DAOs;
-using Malvader.DTOs;
+using Malvader.DTOs.RequestDTOs.Create;
 using Malvader.Models;
 
 namespace Malvader.Services
@@ -43,6 +43,7 @@ namespace Malvader.Services
             return (novaAgencia, null);
         }
 
+        #region Private Methods
         private (EnderecoAgencia? agencia, ErrorResponse? errorResponse) CriarEnderecoAgencia(
             CreateAgenciaRequestDTO requestDto,
             List<string> errors)
@@ -91,5 +92,6 @@ namespace Malvader.Services
             novoEnderecoAgencia = _enderecoAgenciaDao.Inserir(novoEnderecoAgencia);
             return (novoEnderecoAgencia, null);
         }
+        #endregion
     }
 }
