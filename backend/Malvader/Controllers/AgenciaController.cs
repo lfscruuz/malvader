@@ -1,7 +1,10 @@
-﻿using Malvader.DTOs.RequestDTOs.Create;
+﻿using Malvader.DTOs.Read;
+using Malvader.DTOs.RequestDTOs.Create;
 using Malvader.DTOs.ResponseDTOs.Create;
+using Malvader.DTOs.ResponseDTOs.Read;
 using Malvader.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography;
 
 namespace Malvader.Controllers
 {
@@ -48,6 +51,32 @@ namespace Malvader.Controllers
                 Estado = endereco.Estado,
                 Complemento = endereco.Complemento,
             };
+            return Ok(agenciaResponseDto);
+        }
+        [HttpGet("{id}")]
+        public IActionResult GetAgencia(int id)
+        {
+            var (agencia, enderecoAgencia, errorResponse) = _agenciaService.GetById(id);
+            if (errorResponse != null) { return BadRequest(errorResponse); }
+            var enderecoAgenciaResponseDto = new ReadEnderecoAgenciaResponseDTO
+            {
+                Id = enderecoAgencia.Id,
+                Cep = enderecoAgencia.Cep,
+                Local = enderecoAgencia.Local,
+                Numero = enderecoAgencia.Numero,
+                Bairro = enderecoAgencia.Bairro,
+                Cidade = enderecoAgencia.Cidade,
+                Estado = enderecoAgencia.Estado,
+                Complemento = enderecoAgencia.Complemento
+            };
+            var agenciaResponseDto = new ReadAgenciaResponseDTO
+            {
+                Id = agencia.Id,
+                Nome = agencia.Nome,
+                CodigoAgencia = agencia.CodigoAgencia,
+                EnderecoAgencia = enderecoAgenciaResponseDto
+            };
+
             return Ok(agenciaResponseDto);
         }
     }

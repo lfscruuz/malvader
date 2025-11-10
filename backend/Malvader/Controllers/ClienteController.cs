@@ -37,7 +37,7 @@ namespace Malvader.Controllers
               "scoreCredito": 0
         }*/
             var errors = new List<string>();
-            var (cliente, usuario, errorResponse) = _usuarioService.CriarCliente(requestDto, errors);
+            var (cliente, usuario, errorResponse) = _usuarioService.CreateCliente(requestDto, errors);
             if (cliente == null) return BadRequest(errorResponse);
 
             var usuarioResponseDto = new CreateUsuarioResponseDTO

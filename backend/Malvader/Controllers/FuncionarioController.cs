@@ -37,7 +37,7 @@ namespace Malvader.Controllers
                 "supervisorId": 0
             }*/
             var errors = new List<string>();
-            var (funcionario, usuario, errorResponse) = _usuarioService.CriarFuncionario(requestDto, errors);
+            var (funcionario, usuario, errorResponse) = _usuarioService.CreateFuncionario(requestDto, errors);
             if (funcionario == null) return BadRequest(errorResponse);
 
             var usuarioResponseDto = new CreateUsuarioResponseDTO

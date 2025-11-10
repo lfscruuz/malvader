@@ -21,11 +21,11 @@ namespace Malvader.Services
         }
         #region Public Methods
         #region Inserts
-        public (Cliente? cliente, Usuario? usuario, ErrorResponse? errorResponse) CriarCliente(
+        public (Cliente? cliente, Usuario? usuario, ErrorResponse? errorResponse) CreateCliente(
             CreateClienteRequestDTO requestDto,
             List<string> errors)
         {
-            var (usuario, errorResponse) = CriarUsuario(requestDto, errors);
+            var (usuario, errorResponse) = CreateUsuario(requestDto, errors);
             if (usuario == null) return (null, null, new ErrorResponse { Errors = errors });
 
             if (string.IsNullOrEmpty(usuario?.Id.ToString()))
@@ -51,11 +51,11 @@ namespace Malvader.Services
             novoCliente = _clienteDao.Insert(novoCliente);
             return (novoCliente, usuario, null);
         }
-        public (Funcionario? funcionario, Usuario? usuario, ErrorResponse? errorResponse) CriarFuncionario(
+        public (Funcionario? funcionario, Usuario? usuario, ErrorResponse? errorResponse) CreateFuncionario(
             CreateFuncionarioRequestDTO requestDto,
             List<string> errors)
         {
-            var (usuario, errorResponse) = CriarUsuario(requestDto, errors);
+            var (usuario, errorResponse) = CreateUsuario(requestDto, errors);
             if (usuario == null) return (null, null, new ErrorResponse { Errors = errors });
 
             if (string.IsNullOrEmpty(usuario?.Id.ToString()))
@@ -116,7 +116,7 @@ namespace Malvader.Services
         #endregion
 
         #region Private Methods
-        private (Usuario? usuario, ErrorResponse? errorResponse) CriarUsuario(
+        private (Usuario? usuario, ErrorResponse? errorResponse) CreateUsuario(
            CreateUsuarioRequestDTO requestDTO,
            List<string> errors)
         {

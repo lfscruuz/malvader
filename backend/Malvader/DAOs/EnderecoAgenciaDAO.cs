@@ -37,5 +37,35 @@ namespace Malvader.DAOs
 
             return endereco;
         }
+
+        public EnderecoAgencia? GetById(int id)
+        {
+            using var conn = _connectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM endereco_agencia WHERE id_endereco_agencia = @enderecoAgenciaId
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@enderecoAgenciaId", id);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new EnderecoAgencia
+                {
+                    Id = reader.GetInt32("id_endereco_agencia"),
+                    Cep = reader.GetString("cep"),
+                    Local = reader.GetString("local"),
+                    Bairro = reader.GetString("bairro"),
+                    Cidade = reader.GetString("cidade"),
+                    Estado = reader.GetString("estado"),
+                    Complemento = reader.GetString("complemento")
+                };
+            }
+
+            return null;
+        }
     }
 }

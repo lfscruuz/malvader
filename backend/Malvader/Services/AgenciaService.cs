@@ -43,6 +43,23 @@ namespace Malvader.Services
             return (novaAgencia, enderecoAgencia, null);
         }
 
+        public (Agencia? agencia, EnderecoAgencia? enderecoAgencia, ErrorResponse? errorResponse) GetById(int id)
+        {
+            var errorResponse = new ErrorResponse();
+            var agencia = _agenciaDao.GetById(id);
+            if (agencia == null) { 
+                errorResponse.Errors.Add("Não foi possível encontrar a agencia com o ID informado");
+                return (null, null, errorResponse);
+            }
+            (var enderecoAgencia, errorResponse) = GetEnderecoAgenciaById(agencia.EnderecoAgenciaId);
+            if (enderecoAgencia == null)
+            {
+                errorResponse.Errors.Add("Não foi possível encontrar o endereço da agencia com o ID informado");
+                return (null, null, errorResponse);
+            }
+            return (agencia, enderecoAgencia, null);
+        }
+
         #region Private Methods
         private (EnderecoAgencia? agencia, ErrorResponse? errorResponse) CriarEnderecoAgencia(
             CreateAgenciaRequestDTO requestDto,
@@ -91,6 +108,18 @@ namespace Malvader.Services
 
             novoEnderecoAgencia = _enderecoAgenciaDao.Insert(novoEnderecoAgencia);
             return (novoEnderecoAgencia, null);
+        }
+
+        private (EnderecoAgencia? enderecoAgencia, ErrorResponse? errorResponse) GetEnderecoAgenciaById(int id)
+        {
+            var errorResponse = new ErrorResponse();
+            var enderecoAgencia = _enderecoAgenciaDao.GetById(id);
+            if (enderecoAgencia == null)
+            {
+                errorResponse.Errors.Add("Não foi possível encontrar o endereço da agencia com o ID informado");
+                return (null, errorResponse);
+            }
+            return (enderecoAgencia, null);
         }
         #endregion
     }
