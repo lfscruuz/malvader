@@ -1,10 +1,10 @@
 ﻿using Malvader.Models;
 
-namespace Malvader.DTOs.ResponseDTOs.Create
+namespace Malvader.DTOs.ResponseDTOs.Read
 {
-    public class CreateUsuarioResponseDTO
+    public class ReadUsuarioResponseDTO
     {
-
+        public int Id { get; set; }
         public string Nome { get; set; }
         public string CPF { get; set; }
         public DateTime DataNascimento { get; set; }

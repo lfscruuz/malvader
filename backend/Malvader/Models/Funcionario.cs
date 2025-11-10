@@ -14,6 +14,6 @@
         public int AgenciaId { get; set; }
         public string? CodigoFuncionario { get; set; }
         public Cargo Cargo { get; set; }
-        public int SupervisorId { get; set; }
+        public int? SupervisorId { get; set; }
     }
 }

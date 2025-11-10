@@ -2,13 +2,14 @@
 using Malvader.DAOs;
 using Malvader.DTOs.RequestDTOs.Create;
 using Malvader.DTOs.ResponseDTOs.Create;
+using Malvader.DTOs.ResponseDTOs.Read;
 using Malvader.Models;
 using Malvader.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Malvader.Controllers
 {
-    [Route("api/usuario")]
+    [Route("api/usuario/cliente")]
     [ApiController]
     public class ClienteCOntroller : ControllerBase
     {
@@ -23,8 +24,8 @@ namespace Malvader.Controllers
             _usuarioService = usuarioService;
         }
 
-        [HttpPost("cliente")]
-        public ActionResult NovoCliente([FromBody] CreateClienteRequestDTO requestDto)
+        [HttpPost]
+        public ActionResult NewCliente([FromBody] CreateClienteRequestDTO requestDto)
         {
         /*{
             "nome": "luis",
@@ -45,13 +46,38 @@ namespace Malvader.Controllers
                 CPF = usuario.CPF,
                 DataNascimento = usuario.DataNascimento,
                 Telefone = usuario.Telefone,
-                TipoUsuario = usuario.Tipo
+                TipoUsuario = usuario.TipoUsuario
             };
-            var clienteResponseDto = new CreateFuncionarioResponseDTO
+            var clienteResponseDto = new CreateClienteResponseDTO
             {
                 Id = cliente.Id,
                 Success = true,
                 Message = "Funcionário criado com sucesso!",
+                Usuario = usuarioResponseDto
+            };
+
+            return Ok(clienteResponseDto);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetCliente(int id)
+        {
+            var (cliente, usuario, errorResponse) = _usuarioService.GetClienteById(id);
+            if (cliente == null) return NotFound(errorResponse);
+            var usuarioResponseDto = new ReadUsuarioResponseDTO
+            {
+                Id = usuario.Id,
+                Nome = usuario.Nome,
+                CPF = usuario.CPF,
+                DataNascimento = usuario.DataNascimento,
+                Telefone = usuario.Telefone,
+                TipoUsuario = usuario.TipoUsuario
+            };
+            var clienteResponseDto = new ReadClienteResponseDTO
+            {
+                Id = cliente.Id,
+                Success = true,
+                Message = "query realizada com sucesso!",
                 Usuario = usuarioResponseDto
             };
 

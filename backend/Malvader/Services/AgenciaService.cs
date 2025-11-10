@@ -89,7 +89,7 @@ namespace Malvader.Services
                 Complemento = requestDto.Complemento
             };
 
-            novoEnderecoAgencia = _enderecoAgenciaDao.Inserir(novoEnderecoAgencia);
+            novoEnderecoAgencia = _enderecoAgenciaDao.Insert(novoEnderecoAgencia);
             return (novoEnderecoAgencia, null);
         }
         #endregion

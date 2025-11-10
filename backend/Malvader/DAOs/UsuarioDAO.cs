@@ -11,7 +11,7 @@ namespace Malvader.DAO
         {
             _connectionFactory = connectionFactory;
         }
-        public Usuario Inserir(Usuario usuario)
+        public Usuario Insert(Usuario usuario)
         {
             using var conn = _connectionFactory.CreateConnection();
             conn.Open();
@@ -27,7 +27,7 @@ namespace Malvader.DAO
             cmd.Parameters.AddWithValue("@cpf", usuario.CPF);
             cmd.Parameters.AddWithValue("@dataNascimento", usuario.DataNascimento);
             cmd.Parameters.AddWithValue("@telefone", usuario.Telefone);
-            cmd.Parameters.AddWithValue("@tipoUsuario", usuario.Tipo.ToString());
+            cmd.Parameters.AddWithValue("@tipoUsuario", usuario.TipoUsuario.ToString());
             cmd.Parameters.AddWithValue("@senhaHash", usuario.SenhaHash);
 
             var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
@@ -53,12 +53,42 @@ namespace Malvader.DAO
                     CPF = reader.GetString("cpf"),
                     DataNascimento = reader.GetDateTime("data_nascimento"),
                     Telefone = reader.GetString("telefone"),
-                    Tipo = Enum.Parse<TipoUsuario>(reader.GetString("tipo_usuario")),
+                    TipoUsuario = Enum.Parse<TipoUsuario>(reader.GetString("tipo_usuario")),
                     SenhaHash = reader.GetString("senha_hash")
                 });
             }
 
             return usuarios;
+        }
+
+        public Usuario? GetById(int id)
+        {
+            using var conn = _connectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM usuario WHERE id_usuario = @usuarioId
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@usuarioId", id);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Usuario
+                {
+                    Id = reader.GetInt32("id_usuario"),
+                    Nome = reader.GetString("nome"),
+                    CPF = reader.GetString("cpf"),
+                    DataNascimento = reader.GetDateTime("data_nascimento"),
+                    Telefone = reader.GetString("telefone"),
+                    TipoUsuario = Enum.Parse<TipoUsuario>(reader.GetString("tipo_usuario")),
+                    SenhaHash = reader.GetString("senha_hash")
+                };
+            }
+
+            return null;
         }
 
     }

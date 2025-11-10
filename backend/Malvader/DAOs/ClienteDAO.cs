@@ -13,7 +13,7 @@ namespace Malvader.DAOs
             _connectionFactory = connectionFactory;
         }
 
-        public Cliente Inserir(Cliente cliente) 
+        public Cliente Insert(Cliente cliente) 
         {
             using var conn = _connectionFactory.CreateConnection();
             conn.Open();
@@ -32,6 +32,32 @@ namespace Malvader.DAOs
             cliente.Id = insertedId;
 
             return cliente;
+        }
+
+        public Cliente? GetById(int id)
+        {
+            using var conn = _connectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM cliente WHERE id_cliente = @clienteId
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@clienteId", id);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Cliente
+                {
+                    Id = reader.GetInt32("id_cliente"),
+                    UsuarioId = reader.GetInt32("id_usuario"),
+                    ScoreCredito = reader.GetDecimal("score_credito")
+                };
+            }
+
+            return null;
         }
     }
 }

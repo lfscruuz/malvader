@@ -12,7 +12,7 @@ namespace Malvader.DAOs
             _connectionFactory = connectionFactory;
         }
 
-        public EnderecoAgencia Inserir(EnderecoAgencia endereco)
+        public EnderecoAgencia Insert(EnderecoAgencia endereco)
         {
             using var conn = _connectionFactory.CreateConnection();
             conn.Open();

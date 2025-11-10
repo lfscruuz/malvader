@@ -4,8 +4,9 @@ namespace Malvader.DTOs.RequestDTOs.Create
 {
     public class CreateFuncionarioRequestDTO : CreateUsuarioRequestDTO
     {
-        public required Agencia Agencia { get; set; }
+        public required int AgenciaId { get; set; }
         public Cargo Cargo { get; set; }
-        public Funcionario? Supervisor { get; set; }
+        public int? SupervisorId { get; set; }
+        public string? CodigoFuncionario { get; set; }
     }
 }

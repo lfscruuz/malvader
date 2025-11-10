@@ -13,7 +13,7 @@ namespace Malvader.DAOs
             _connectionFactory = connectionFactory;
         }
 
-        public Funcionario Inserir(Funcionario funcionario) 
+        public Funcionario Insert(Funcionario funcionario) 
         {
             using var conn = _connectionFactory.CreateConnection();
             conn.Open();
@@ -29,12 +29,41 @@ namespace Malvader.DAOs
             cmd.Parameters.AddWithValue("@agenciaId", funcionario.AgenciaId);
             cmd.Parameters.AddWithValue("@codigoFuncionario", funcionario.CodigoFuncionario);
             cmd.Parameters.AddWithValue("@cargo", funcionario.Cargo.ToString());
-            cmd.Parameters.AddWithValue("@supervisorId", funcionario.UsuarioId);
+            cmd.Parameters.AddWithValue("@supervisorId", funcionario.SupervisorId);
 
             var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
             funcionario.Id = insertedId;
 
             return funcionario;
+        }
+
+        public Funcionario? GetById(int id)
+        {
+            using var conn = _connectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM funcionario WHERE id_funcionario = @funcionarioId
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@funcionarioId", id);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Funcionario
+                {
+                    Id = reader.GetInt32("id_funcionario"),
+                    UsuarioId = reader.GetInt32("id_usuario"),
+                    AgenciaId = reader.GetInt32("id_agencia"),
+                    CodigoFuncionario = reader.GetString("codigo_funcionario"),
+                    Cargo = Enum.Parse<Cargo>(reader.GetString("cargo")),
+                    SupervisorId = reader.IsDBNull(reader.GetOrdinal("id_supervisor")) ? null : reader.GetInt32("id_supervisor")
+                };
+            }
+
+            return null;
         }
     }
 }

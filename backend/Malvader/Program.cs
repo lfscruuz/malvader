@@ -2,6 +2,7 @@ using Malvader.DAO;
 using Malvader.DAOs;
 using Malvader.Models;
 using Malvader.Services;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -22,6 +23,12 @@ builder.Services.AddScoped<ClienteDAO>();
 builder.Services.AddScoped<FuncionarioDAO>();
 builder.Services.AddScoped<AgenciaDAO>();
 builder.Services.AddScoped<EnderecoAgenciaDAO>();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 var app = builder.Build();
 

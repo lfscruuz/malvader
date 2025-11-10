@@ -12,26 +12,26 @@ namespace Malvader.DAOs
             _dbConnectionFactory = dbConnectionFactory;
         }
 
-        public Conta Insert(Agencia agencia)
-        {
-            using var conn = _dbConnectionFactory.CreateConnection();
-            conn.Open();
+        //public Conta Insert(Agencia agencia)
+        //{
+        //    using var conn = _dbConnectionFactory.CreateConnection();
+        //    conn.Open();
 
-            string sql = @"
-                INSERT INTO agencia (nome, codigo_agencia, endereco_id)
-                VALUES (@nome, @codigoAgencia, @enderecoId);
-                SELECT LAST_INSERT_ID();
-            ";
+        //    string sql = @"
+        //        INSERT INTO agencia (nome, codigo_agencia, endereco_id)
+        //        VALUES (@nome, @codigoAgencia, @enderecoId);
+        //        SELECT LAST_INSERT_ID();
+        //    ";
 
-            using var cmd = new MySqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@nome", agencia.Nome);
-            cmd.Parameters.AddWithValue("@codigoAgencia", agencia.CodigoAgencia);
-            cmd.Parameters.AddWithValue("@enderecoId", agencia.EnderecoAgencia.Id);
+        //    using var cmd = new MySqlCommand(sql, conn);
+        //    cmd.Parameters.AddWithValue("@nome", agencia.Nome);
+        //    cmd.Parameters.AddWithValue("@codigoAgencia", agencia.CodigoAgencia);
+        //    cmd.Parameters.AddWithValue("@enderecoId", agencia.EnderecoAgenciaId);
 
-            var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
-            agencia.Id = insertedId;
+        //    var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
+        //    agencia.Id = insertedId;
 
-            return agencia;
-        }
+        //    return agencia;
+        //}
     }
 }
