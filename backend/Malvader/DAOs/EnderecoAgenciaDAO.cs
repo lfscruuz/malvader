@@ -5,16 +5,16 @@ namespace Malvader.DAOs
 {
     public class EnderecoAgenciaDAO
     {
-        private readonly DbConnectionFactory _connectionFactory;
+        private readonly DbConnectionFactory _dbConnectionFactory;
 
         public EnderecoAgenciaDAO(DbConnectionFactory connectionFactory)
         {
-            _connectionFactory = connectionFactory;
+            _dbConnectionFactory = connectionFactory;
         }
 
         public EnderecoAgencia Insert(EnderecoAgencia endereco)
         {
-            using var conn = _connectionFactory.CreateConnection();
+            using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
 
             string sql = @"
@@ -40,7 +40,7 @@ namespace Malvader.DAOs
 
         public EnderecoAgencia? GetById(int id)
         {
-            using var conn = _connectionFactory.CreateConnection();
+            using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
 
             string sql = @"

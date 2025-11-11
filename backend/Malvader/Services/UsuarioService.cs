@@ -102,6 +102,40 @@ namespace Malvader.Services
 
             return (cliente, usuario, null);
         }
+        public (ReadClienteResponseDTO? cliente, ErrorResponse? errorResponse) GetClienteByUsuarioId(int id)
+        {
+            var errors = new List<string>();
+            Cliente? cliente = _clienteDao.GetByUsuarioId(id);
+            if (cliente == null) return (null, new ErrorResponse { Errors = ["Não foi possível encontrar o cliente pelo ID informado"] });
+
+            var responseDto = new ReadClienteResponseDTO
+            {
+                Id = cliente.Id,
+                Success = true,
+                Message = "Cliente requisitado com sucesso!",
+                ScoreCredito = cliente.ScoreCredito
+            };
+            return (responseDto, null);
+        }
+        public (ReadFuncionarioResponseDTO? funcionario, ErrorResponse? errorResponse) GetFuncionarioByUsuarioId(int id)
+        {
+            var errors = new List<string>();
+            Funcionario? funcionario = _funcionarioDao.GetByUsuarioId(id);
+            if (funcionario == null) return (null, new ErrorResponse { Errors = ["Não foi possível encontrar o funcionario pelo ID informado"] });
+
+            var responseDto = new ReadFuncionarioResponseDTO
+            {
+                Id = funcionario.Id,
+                Success = true,
+                Message = "Cliente requisitado com sucesso!",
+                AgenciaId = funcionario.AgenciaId,
+                CodigoFuncionario = funcionario.CodigoFuncionario,
+                Cargo = funcionario.Cargo,
+                SupervisorId = funcionario.SupervisorId
+                
+            };
+            return (responseDto, null);
+        }
         public (Funcionario? funcionario, Usuario? usuario, ErrorResponse? errorResponse) GetFuncionarioById(int id)
         {
             var errors = new List<string>();

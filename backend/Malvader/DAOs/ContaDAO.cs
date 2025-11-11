@@ -12,26 +12,58 @@ namespace Malvader.DAOs
             _dbConnectionFactory = dbConnectionFactory;
         }
 
-        //public Conta Insert(Agencia agencia)
-        //{
-        //    using var conn = _dbConnectionFactory.CreateConnection();
-        //    conn.Open();
+        public Conta Insert(Conta conta)
+        {
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
 
-        //    string sql = @"
-        //        INSERT INTO agencia (nome, codigo_agencia, endereco_id)
-        //        VALUES (@nome, @codigoAgencia, @enderecoId);
-        //        SELECT LAST_INSERT_ID();
-        //    ";
+            string sql = @"
+                INSERT INTO conta (id_agencia, tipo_conta, id_cliente, status)
+                VALUES (@agenciaId, @tipoConta, @clienteId, @status);
+                SELECT LAST_INSERT_ID();
+            ";
 
-        //    using var cmd = new MySqlCommand(sql, conn);
-        //    cmd.Parameters.AddWithValue("@nome", agencia.Nome);
-        //    cmd.Parameters.AddWithValue("@codigoAgencia", agencia.CodigoAgencia);
-        //    cmd.Parameters.AddWithValue("@enderecoId", agencia.EnderecoAgenciaId);
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@agenciaId", conta.AgenciaId);
+            cmd.Parameters.AddWithValue("@tipoConta", conta.TipoConta);
+            cmd.Parameters.AddWithValue("@clienteId", conta.ClienteId);
+            cmd.Parameters.AddWithValue("@status", conta.StatusConta);
 
-        //    var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
-        //    agencia.Id = insertedId;
+            var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
+            conta.Id = insertedId;
 
-        //    return agencia;
-        //}
+            return conta;
+        }
+
+        public Conta? GetById(int id)
+        {
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM conta WHERE id_conta = @contaId
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@contaId", id);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Conta
+                {
+                    Id = reader.GetInt32("id_usuario"),
+                    NumeroConta = reader.GetString("numero_conta"),
+                    AgenciaId = reader.GetInt32("id_agencia"),
+                    Saldo = reader.GetDecimal("saldo"),
+                    TipoConta = Enum.Parse<TipoConta>(reader.GetString("tipo_conta")),
+                    ClienteId = reader.GetInt32("id_cliente"),
+                    DataAbertura = reader.GetDateTime("data_abertura"),
+                    StatusConta = Enum.Parse<StatusConta>(reader.GetString("status_conta"))
+                };
+            }
+
+            return null;
+        }
     }
 }

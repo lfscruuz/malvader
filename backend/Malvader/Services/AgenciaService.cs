@@ -15,9 +15,9 @@ namespace Malvader.Services
             _enderecoAgenciaDao = enderecoAgenciaDao;
         }
 
-        public (Agencia? agencia, EnderecoAgencia? endereco, ErrorResponse? errorResponse) CriarAgencia(CreateAgenciaRequestDTO requestDto, List<string> errors)
+        public (Agencia? agencia, EnderecoAgencia? endereco, ErrorResponse? errorResponse) CreateAgencia(CreateAgenciaRequestDTO requestDto, List<string> errors)
         {
-            var (enderecoAgencia, errorResponse) = CriarEnderecoAgencia(requestDto, errors);
+            var (enderecoAgencia, errorResponse) = CreateEnderecoAgencia(requestDto, errors);
             if (enderecoAgencia == null)
             {
                 return (null, null, errorResponse);
@@ -61,7 +61,7 @@ namespace Malvader.Services
         }
 
         #region Private Methods
-        private (EnderecoAgencia? agencia, ErrorResponse? errorResponse) CriarEnderecoAgencia(
+        private (EnderecoAgencia? agencia, ErrorResponse? errorResponse) CreateEnderecoAgencia(
             CreateAgenciaRequestDTO requestDto,
             List<string> errors)
         {

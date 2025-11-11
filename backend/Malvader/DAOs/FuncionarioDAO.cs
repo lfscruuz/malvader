@@ -6,16 +6,16 @@ namespace Malvader.DAOs
 {
     public class FuncionarioDAO
     {
-        private readonly DbConnectionFactory _connectionFactory;
+        private readonly DbConnectionFactory _dbConnectionFactory;
 
         public FuncionarioDAO(DbConnectionFactory connectionFactory, UsuarioDAO suarioDao)
         {
-            _connectionFactory = connectionFactory;
+            _dbConnectionFactory = connectionFactory;
         }
 
         public Funcionario Insert(Funcionario funcionario) 
         {
-            using var conn = _connectionFactory.CreateConnection();
+            using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
 
             string sql = @"
@@ -39,7 +39,7 @@ namespace Malvader.DAOs
 
         public Funcionario? GetById(int id)
         {
-            using var conn = _connectionFactory.CreateConnection();
+            using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
 
             string sql = @"
@@ -48,6 +48,35 @@ namespace Malvader.DAOs
 
             using var cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@funcionarioId", id);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Funcionario
+                {
+                    Id = reader.GetInt32("id_funcionario"),
+                    UsuarioId = reader.GetInt32("id_usuario"),
+                    AgenciaId = reader.GetInt32("id_agencia"),
+                    CodigoFuncionario = reader.GetString("codigo_funcionario"),
+                    Cargo = Enum.Parse<Cargo>(reader.GetString("cargo")),
+                    SupervisorId = reader.IsDBNull(reader.GetOrdinal("id_supervisor")) ? null : reader.GetInt32("id_supervisor")
+                };
+            }
+
+            return null;
+        }
+        public Funcionario? GetByUsuarioId(int id)
+        {
+            Console.WriteLine(id);
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM funcionario WHERE id_usuario = @usuarioId
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@usuarioId", id);
 
             using var reader = cmd.ExecuteReader();
             if (reader.Read())

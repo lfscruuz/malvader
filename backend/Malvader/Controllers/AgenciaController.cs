@@ -34,7 +34,7 @@ namespace Malvader.Controllers
                 "complemento": "complemento1"
             }*/
             var errors = new List<string>();
-            var (agencia, endereco, errorResponse) = _agenciaService.CriarAgencia(requestDTO, errors);
+            var (agencia, endereco, errorResponse) = _agenciaService.CreateAgencia(requestDTO, errors);
             if (errorResponse != null) {
                 return BadRequest(errorResponse);
             }

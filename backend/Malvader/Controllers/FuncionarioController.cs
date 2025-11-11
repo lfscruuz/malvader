@@ -78,8 +78,7 @@ namespace Malvader.Controllers
             {
                 Id = funcionario.Id,
                 Success = true,
-                Message = "query realizada com sucesso!",
-                Usuario = usuarioResponseDto
+                Message = "query realizada com sucesso!"
             };
 
             return Ok(funcionarioResponseDto);

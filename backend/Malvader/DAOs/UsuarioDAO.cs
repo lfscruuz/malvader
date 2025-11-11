@@ -5,15 +5,15 @@ namespace Malvader.DAO
 {
     public class UsuarioDAO
     {
-        private readonly DbConnectionFactory _connectionFactory;
+        private readonly DbConnectionFactory _dbConnectionFactory;
 
         public UsuarioDAO(DbConnectionFactory connectionFactory)
         {
-            _connectionFactory = connectionFactory;
+            _dbConnectionFactory = connectionFactory;
         }
         public Usuario Insert(Usuario usuario)
         {
-            using var conn = _connectionFactory.CreateConnection();
+            using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
 
             string sql = @"
@@ -38,7 +38,7 @@ namespace Malvader.DAO
         public List<Usuario> ListarTodos()
         {
             var usuarios = new List<Usuario>();
-            using var conn = _connectionFactory.CreateConnection();
+            using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
 
             string sql = "SELECT * FROM usuario";
@@ -63,7 +63,7 @@ namespace Malvader.DAO
 
         public Usuario? GetById(int id)
         {
-            using var conn = _connectionFactory.CreateConnection();
+            using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
 
             string sql = @"
@@ -91,5 +91,32 @@ namespace Malvader.DAO
             return null;
         }
 
+        public Usuario? GetByCpf(string cpf) {
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM usuario WHERE cpf = @cpf
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@cpf", cpf);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Usuario
+                {
+                    Id = reader.GetInt32("id_usuario"),
+                    Nome = reader.GetString("nome"),
+                    CPF = reader.GetString("cpf"),
+                    DataNascimento = reader.GetDateTime("data_nascimento"),
+                    Telefone = reader.GetString("telefone"),
+                    TipoUsuario = Enum.Parse<TipoUsuario>(reader.GetString("tipo_usuario")),
+                    SenhaHash = reader.GetString("senha_hash")
+                };
+            }
+            return null;
+        }
     }
 }

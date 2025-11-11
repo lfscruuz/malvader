@@ -6,16 +6,16 @@ namespace Malvader.DAOs
 {
     public class ClienteDAO
     {
-        private readonly DbConnectionFactory _connectionFactory;
+        private readonly DbConnectionFactory _dbConnectionFactory;
 
         public ClienteDAO(DbConnectionFactory connectionFactory, UsuarioDAO usarioDao)
         {
-            _connectionFactory = connectionFactory;
+            _dbConnectionFactory = connectionFactory;
         }
 
         public Cliente Insert(Cliente cliente) 
         {
-            using var conn = _connectionFactory.CreateConnection();
+            using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
 
             string sql = @"
@@ -36,7 +36,7 @@ namespace Malvader.DAOs
 
         public Cliente? GetById(int id)
         {
-            using var conn = _connectionFactory.CreateConnection();
+            using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
 
             string sql = @"
@@ -45,6 +45,32 @@ namespace Malvader.DAOs
 
             using var cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@clienteId", id);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Cliente
+                {
+                    Id = reader.GetInt32("id_cliente"),
+                    UsuarioId = reader.GetInt32("id_usuario"),
+                    ScoreCredito = reader.GetDecimal("score_credito")
+                };
+            }
+
+            return null;
+        }
+
+        public Cliente GetByUsuarioId(int id)
+        {
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM cliente WHERE id_usuario = @usuarioId
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@usuarioId", id);
 
             using var reader = cmd.ExecuteReader();
             if (reader.Read())
