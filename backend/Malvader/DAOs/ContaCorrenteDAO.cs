@@ -12,7 +12,7 @@ namespace Malvader.DAOs
             _dbConnectionFactory = dbConnectionFactory;
         }
 
-        public ContaCorrente Insert(ContaCorrente contaCorrente, int contaId)
+        public ContaCorrente Insert(ContaCorrente contaCorrente)
         {
             using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
