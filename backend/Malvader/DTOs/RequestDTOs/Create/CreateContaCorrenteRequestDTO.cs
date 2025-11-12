@@ -2,6 +2,6 @@
 {
     public class CreateContaCorrenteRequestDTO : CreateContaRequestDTO
     {
-
+        public DateTime DataVencimento { get; set; }
     }
 }

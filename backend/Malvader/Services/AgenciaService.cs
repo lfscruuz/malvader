@@ -15,23 +15,16 @@ namespace Malvader.Services
             _enderecoAgenciaDao = enderecoAgenciaDao;
         }
 
-        public (Agencia? agencia, EnderecoAgencia? endereco, ErrorResponse? errorResponse) CreateAgencia(CreateAgenciaRequestDTO requestDto, List<string> errors)
+        public (Agencia? agencia, EnderecoAgencia? endereco) CreateAgencia(CreateAgenciaRequestDTO requestDto)
         {
-            var (enderecoAgencia, errorResponse) = CreateEnderecoAgencia(requestDto, errors);
-            if (enderecoAgencia == null)
-            {
-                return (null, null, errorResponse);
-            }
+            var enderecoAgencia = CreateEnderecoAgencia(requestDto);
+            var errors = new List<string>();
 
             if (string.IsNullOrEmpty(requestDto.Nome))
             {
-                errors.Add("Nome é obrigatório");
+                throw new ArgumentException("Nome é obrigatório.");
             }
-            if (errors.Any())
-            {
-                errorResponse = new ErrorResponse { Errors = errors };
-                return (null, null, errorResponse);
-            }
+
             var novaAgencia = new Agencia
             {
                 Nome = requestDto.Nome,
@@ -40,31 +33,20 @@ namespace Malvader.Services
             };
 
             novaAgencia = _agenciaDao.Insert(novaAgencia);
-            return (novaAgencia, enderecoAgencia, null);
+            return (novaAgencia, enderecoAgencia);
         }
 
-        public (Agencia? agencia, EnderecoAgencia? enderecoAgencia, ErrorResponse? errorResponse) GetById(int id)
+        public (Agencia? agencia, EnderecoAgencia? enderecoAgencia) GetById(int id)
         {
-            var errorResponse = new ErrorResponse();
             var agencia = _agenciaDao.GetById(id);
-            if (agencia == null) { 
-                errorResponse.Errors.Add("Não foi possível encontrar a agencia com o ID informado");
-                return (null, null, errorResponse);
-            }
-            (var enderecoAgencia, errorResponse) = GetEnderecoAgenciaById(agencia.EnderecoAgenciaId);
-            if (enderecoAgencia == null)
-            {
-                errorResponse.Errors.Add("Não foi possível encontrar o endereço da agencia com o ID informado");
-                return (null, null, errorResponse);
-            }
-            return (agencia, enderecoAgencia, null);
+            var enderecoAgencia = GetEnderecoAgenciaById(agencia.EnderecoAgenciaId);
+            return (agencia, enderecoAgencia);
         }
 
         #region Private Methods
-        private (EnderecoAgencia? agencia, ErrorResponse? errorResponse) CreateEnderecoAgencia(
-            CreateAgenciaRequestDTO requestDto,
-            List<string> errors)
+        private EnderecoAgencia CreateEnderecoAgencia(CreateAgenciaRequestDTO requestDto)
         {
+            var errors = new List<string>();
             if (string.IsNullOrEmpty(requestDto.Cep))
             {
                 errors.Add("Cep é obrigatório");
@@ -92,8 +74,7 @@ namespace Malvader.Services
 
             if (errors.Any())
             {
-                var errorResponse = new ErrorResponse { Errors = errors };
-                return (null,  errorResponse);
+                throw new ArgumentException(string.Join("\n", errors));
             }
             var novoEnderecoAgencia = new EnderecoAgencia
             {
@@ -107,19 +88,14 @@ namespace Malvader.Services
             };
 
             novoEnderecoAgencia = _enderecoAgenciaDao.Insert(novoEnderecoAgencia);
-            return (novoEnderecoAgencia, null);
+            return novoEnderecoAgencia;
         }
 
-        private (EnderecoAgencia? enderecoAgencia, ErrorResponse? errorResponse) GetEnderecoAgenciaById(int id)
+        private EnderecoAgencia GetEnderecoAgenciaById(int id)
         {
             var errorResponse = new ErrorResponse();
             var enderecoAgencia = _enderecoAgenciaDao.GetById(id);
-            if (enderecoAgencia == null)
-            {
-                errorResponse.Errors.Add("Não foi possível encontrar o endereço da agencia com o ID informado");
-                return (null, errorResponse);
-            }
-            return (enderecoAgencia, null);
+            return (enderecoAgencia);
         }
         #endregion
     }

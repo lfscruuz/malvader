@@ -36,52 +36,63 @@ namespace Malvader.Controllers
                 "codigoFuncionario" : "abc123",
                 "supervisorId": 0
             }*/
-            var errors = new List<string>();
-            var (funcionario, usuario, errorResponse) = _usuarioService.CreateFuncionario(requestDto, errors);
-            if (funcionario == null) return BadRequest(errorResponse);
-
-            var usuarioResponseDto = new CreateUsuarioResponseDTO
+            try
             {
-                Nome = usuario.Nome,
-                CPF = usuario.CPF,
-                DataNascimento = usuario.DataNascimento,
-                Telefone = usuario.Telefone,
-                TipoUsuario = usuario.TipoUsuario
-            };
-            var funcionarioResponseDto = new CreateFuncionarioResponseDTO
-            {
-                Id = funcionario.Id,
-                Success = true,
-                Message = "Cliente criado com sucesso!",
-                CodigoFuncionario = funcionario.CodigoFuncionario,
-                Usuario = usuarioResponseDto
-            };
+                var (funcionario, usuario) = _usuarioService.CreateFuncionario(requestDto);
 
-            return Ok(funcionarioResponseDto);
+                var usuarioResponseDto = new CreateUsuarioResponseDTO
+                {
+                    Nome = usuario.Nome,
+                    CPF = usuario.CPF,
+                    DataNascimento = usuario.DataNascimento,
+                    Telefone = usuario.Telefone,
+                    TipoUsuario = usuario.TipoUsuario
+                };
+                var funcionarioResponseDto = new CreateFuncionarioResponseDTO
+                {
+                    Id = funcionario.Id,
+                    Success = true,
+                    Message = "Cliente criado com sucesso!",
+                    CodigoFuncionario = funcionario.CodigoFuncionario,
+                    Usuario = usuarioResponseDto
+                };
+
+                return Ok(funcionarioResponseDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("{id}")]
         public IActionResult GetFuncionario(int id)
         {
-            var (funcionario, usuario, errorResponse) = _usuarioService.GetFuncionarioById(id);
-            if (funcionario == null) return NotFound(errorResponse);
-            var usuarioResponseDto = new ReadUsuarioResponseDTO
+            try
             {
-                Id = usuario.Id,
-                Nome = usuario.Nome,
-                CPF = usuario.CPF,
-                DataNascimento = usuario.DataNascimento,
-                Telefone = usuario.Telefone,
-                TipoUsuario = usuario.TipoUsuario
-            };
-            var funcionarioResponseDto = new ReadFuncionarioResponseDTO
-            {
-                Id = funcionario.Id,
-                Success = true,
-                Message = "query realizada com sucesso!"
-            };
+                var (funcionario, usuario) = _usuarioService.GetFuncionarioById(id);
+                var usuarioResponseDto = new ReadUsuarioResponseDTO
+                {
+                    Id = usuario.Id,
+                    Nome = usuario.Nome,
+                    CPF = usuario.CPF,
+                    DataNascimento = usuario.DataNascimento,
+                    Telefone = usuario.Telefone,
+                    TipoUsuario = usuario.TipoUsuario
+                };
+                var funcionarioResponseDto = new ReadFuncionarioResponseDTO
+                {
+                    Id = funcionario.Id,
+                    Success = true,
+                    Message = "query realizada com sucesso!"
+                };
 
-            return Ok(funcionarioResponseDto);
+                return Ok(funcionarioResponseDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         
     }

@@ -25,9 +25,9 @@ namespace Malvader.DAOs
 
             using var cmd = new MySqlCommand(sql, conn);
             cmd.Parameters.AddWithValue("@agenciaId", conta.AgenciaId);
-            cmd.Parameters.AddWithValue("@tipoConta", conta.TipoConta);
+            cmd.Parameters.AddWithValue("@tipoConta", conta.TipoConta.ToString());
             cmd.Parameters.AddWithValue("@clienteId", conta.ClienteId);
-            cmd.Parameters.AddWithValue("@status", conta.StatusConta);
+            cmd.Parameters.AddWithValue("@status", conta.StatusConta.ToString());
 
             var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
             conta.Id = insertedId;

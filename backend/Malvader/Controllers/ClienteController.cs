@@ -62,25 +62,31 @@ namespace Malvader.Controllers
         [HttpGet("{id}")]
         public IActionResult GetCliente(int id)
         {
-            var (cliente, usuario, errorResponse) = _usuarioService.GetClienteById(id);
-            if (cliente == null) return NotFound(errorResponse);
-            var usuarioResponseDto = new ReadUsuarioResponseDTO
+            try
             {
-                Id = usuario.Id,
-                Nome = usuario.Nome,
-                CPF = usuario.CPF,
-                DataNascimento = usuario.DataNascimento,
-                Telefone = usuario.Telefone,
-                TipoUsuario = usuario.TipoUsuario
-            };
-            var clienteResponseDto = new ReadClienteResponseDTO
-            {
-                Id = cliente.Id,
-                Success = true,
-                Message = "query realizada com sucesso!"
-            };
 
-            return Ok(clienteResponseDto);
+                var (cliente, usuario) = _usuarioService.GetClienteById(id);
+                var usuarioResponseDto = new ReadUsuarioResponseDTO
+                {
+                    Id = usuario.Id,
+                    Nome = usuario.Nome,
+                    CPF = usuario.CPF,
+                    DataNascimento = usuario.DataNascimento,
+                    Telefone = usuario.Telefone,
+                    TipoUsuario = usuario.TipoUsuario
+                };
+                var clienteResponseDto = new ReadClienteResponseDTO
+                {
+                    Id = cliente.Id,
+                    Success = true,
+                    Message = "query realizada com sucesso!"
+                };
+
+                return Ok(clienteResponseDto);
+            } catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

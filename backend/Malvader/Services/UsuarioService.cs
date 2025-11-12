@@ -25,7 +25,7 @@ namespace Malvader.Services
             CreateClienteRequestDTO requestDto,
             List<string> errors)
         {
-            var (usuario, errorResponse) = CreateUsuario(requestDto, errors);
+            var usuario = CreateUsuario(requestDto);
             if (usuario == null) return (null, null, new ErrorResponse { Errors = errors });
 
             if (string.IsNullOrEmpty(usuario?.Id.ToString()))
@@ -39,8 +39,7 @@ namespace Malvader.Services
 
             if (errors.Any())
             {
-                errorResponse = new ErrorResponse { Errors = errors };
-                return (null, null, errorResponse);
+                throw new ArgumentException(string.Join("\n", errors));
             }
 
             var novoCliente = new Cliente
@@ -51,12 +50,11 @@ namespace Malvader.Services
             novoCliente = _clienteDao.Insert(novoCliente);
             return (novoCliente, usuario, null);
         }
-        public (Funcionario? funcionario, Usuario? usuario, ErrorResponse? errorResponse) CreateFuncionario(
-            CreateFuncionarioRequestDTO requestDto,
-            List<string> errors)
+        public (Funcionario? funcionario, Usuario? usuario) CreateFuncionario(
+            CreateFuncionarioRequestDTO requestDto)
         {
-            var (usuario, errorResponse) = CreateUsuario(requestDto, errors);
-            if (usuario == null) return (null, null, new ErrorResponse { Errors = errors });
+            var errors = new List<string>();
+            var usuario = CreateUsuario(requestDto);
 
             if (string.IsNullOrEmpty(usuario?.Id.ToString()))
             {
@@ -71,12 +69,11 @@ namespace Malvader.Services
                 errors.Add("Insira o cargo do funcionario");
             }
 
-            if (errors.Any() || usuario == null)
+            if (errors.Any())
             {
-                errorResponse = new ErrorResponse { Errors = errors };
-                return (null, null, errorResponse);
+                throw new ArgumentException(string.Join("\n", errors));
             }
-            Console.WriteLine(requestDto.SupervisorId);
+
             var novoFuncionario = new Funcionario
             {
                 UsuarioId = usuario.Id,
@@ -87,26 +84,20 @@ namespace Malvader.Services
             };
 
             novoFuncionario = _funcionarioDao.Insert(novoFuncionario);
-            return (novoFuncionario, usuario, null);
+            return (novoFuncionario, usuario);
         }
         #endregion
         #region Fetches
-        public (Cliente? cliente, Usuario? usuario, ErrorResponse? errorResponse) GetClienteById(int id)
+        public (Cliente? cliente, Usuario? usuario) GetClienteById(int id)
         {
-            var errors = new List<string>();
-            Cliente? cliente = _clienteDao.GetById(id);
-            if (cliente == null) return (null, null, new ErrorResponse { Errors = ["Não foi possível encontrar o cliente pelo ID informado"] });
+            var cliente = _clienteDao.GetById(id);
+            var usuario = GetUsuarioById(cliente.UsuarioId);
 
-            var (usuario, errorResponse) = GetUsuarioById(cliente.UsuarioId);
-            if (usuario == null) return (null, null, errorResponse);
-
-            return (cliente, usuario, null);
+            return (cliente, usuario);
         }
-        public (ReadClienteResponseDTO? cliente, ErrorResponse? errorResponse) GetClienteByUsuarioId(int id)
+        public ReadClienteResponseDTO GetClienteByUsuarioId(int id)
         {
-            var errors = new List<string>();
-            Cliente? cliente = _clienteDao.GetByUsuarioId(id);
-            if (cliente == null) return (null, new ErrorResponse { Errors = ["Não foi possível encontrar o cliente pelo ID informado"] });
+            var cliente = _clienteDao.GetByUsuarioId(id);
 
             var responseDto = new ReadClienteResponseDTO
             {
@@ -115,14 +106,11 @@ namespace Malvader.Services
                 Message = "Cliente requisitado com sucesso!",
                 ScoreCredito = cliente.ScoreCredito
             };
-            return (responseDto, null);
+            return (responseDto);
         }
-        public (ReadFuncionarioResponseDTO? funcionario, ErrorResponse? errorResponse) GetFuncionarioByUsuarioId(int id)
+        public ReadFuncionarioResponseDTO GetFuncionarioByUsuarioId(int id)
         {
-            var errors = new List<string>();
-            Funcionario? funcionario = _funcionarioDao.GetByUsuarioId(id);
-            if (funcionario == null) return (null, new ErrorResponse { Errors = ["Não foi possível encontrar o funcionario pelo ID informado"] });
-
+            var funcionario = _funcionarioDao.GetByUsuarioId(id);
             var responseDto = new ReadFuncionarioResponseDTO
             {
                 Id = funcionario.Id,
@@ -134,26 +122,23 @@ namespace Malvader.Services
                 SupervisorId = funcionario.SupervisorId
                 
             };
-            return (responseDto, null);
+            return responseDto;
         }
-        public (Funcionario? funcionario, Usuario? usuario, ErrorResponse? errorResponse) GetFuncionarioById(int id)
+        public (Funcionario? funcionario, Usuario? usuario) GetFuncionarioById(int id)
         {
-            var errors = new List<string>();
-            Funcionario? funcionario = _funcionarioDao.GetById(id);
-            if (funcionario == null) return (null, null, new ErrorResponse { Errors = ["Não foi possível encontrar o funcionário pelo ID informado"] });
-            var (usuario, errorResponse) = GetUsuarioById(funcionario.UsuarioId);
-            if (usuario == null) return (null, null, errorResponse);
+            var funcionario = _funcionarioDao.GetById(id);
+            var usuario = GetUsuarioById(funcionario.UsuarioId);
 
-            return (funcionario, usuario, null);
+            return (funcionario, usuario);
         }
         #endregion
         #endregion
 
         #region Private Methods
-        private (Usuario? usuario, ErrorResponse? errorResponse) CreateUsuario(
-           CreateUsuarioRequestDTO requestDTO,
-           List<string> errors)
+        private Usuario CreateUsuario(
+           CreateUsuarioRequestDTO requestDTO)
         {
+            var errors = new List<string>();
             if (string.IsNullOrEmpty(requestDTO.Nome))
             {
                 errors.Add("Preencha o nome");
@@ -181,8 +166,7 @@ namespace Malvader.Services
 
             if (errors.Any())
             {
-                var errorResponse = new ErrorResponse { Errors = errors };
-                return (null, errorResponse);
+                throw new ArgumentException(string.Join("\n", errors));
             }
             var novoUsuario = new Usuario
             {
@@ -195,15 +179,13 @@ namespace Malvader.Services
             };
 
             novoUsuario = _usuarioDao.Insert(novoUsuario);
-            return (novoUsuario, null);
+            return novoUsuario;
         }
 
-        private (Usuario? usuario, ErrorResponse? errorResponse) GetUsuarioById(int id)
+        private Usuario GetUsuarioById(int id)
         {
-            Usuario? usuario = _usuarioDao.GetById(id);
-            if (usuario == null) return (null, new ErrorResponse { Errors = ["Não foi possível encontrar o usuario pelo ID informado"] });
-            
-            return (usuario, null);
+            Usuario usuario = _usuarioDao.GetById(id);
+            return usuario;
         }
         #endregion
     }

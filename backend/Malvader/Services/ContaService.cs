@@ -23,38 +23,39 @@ namespace Malvader.Services
             _contaPoupancaDao = contaPoupancaDao;
         }
 
-        //public (ContaCorrente? conta, ErrorResponse? errorResponse) CreateConta(CreateContaCorrenteRequestDTO requestDto)
-        //{
-        //    var errorResponse = new ErrorResponse();
-        //    (var conta, errorResponse) = CreateConta(requestDto, errorResponse);
-
-        //    if (errorResponse != null) return (null, errorResponse);
-
-        //    if (string.IsNullOrEmpty(requestDto.TipoConta.ToString()))
-        //    {
-        //        errorResponse.Errors.Add("Tipo da conta é obrigatório");
-        //    }
-        //}
-        private (Conta? conta, ErrorResponse? errorResponse) CreateConta(CreateContaRequestDTO requestDto, ErrorResponse errorResponse)
+        public ContaCorrente CreateContaCorrente(CreateContaCorrenteRequestDTO requestDto)
         {
 
-            if (string.IsNullOrEmpty(requestDto.AgenciaId.ToString()))
-            {
-                errorResponse.Errors.Add("ID da agência é obrigatório");
-            }
             if (string.IsNullOrEmpty(requestDto.TipoConta.ToString()))
             {
-                errorResponse.Errors.Add("Tipo da conta é obrigatório");
-            }
-            if (string.IsNullOrEmpty(requestDto.ClienteId.ToString()))
-            {
-                errorResponse.Errors.Add("ID do clinete é obrigatório");
+                throw new Exception("Tipo da conta é obrigatório\n");
             }
 
-            if (errorResponse.Errors.Any())
+            var conta = CreateConta(requestDto);
+            var contaCorrente = new ContaCorrente
             {
-                return (null, errorResponse);
-            }
+                ContaId = conta.Id,
+                DataVencimento = requestDto.DataVencimento
+            };
+            contaCorrente = _contaCorrenteDao.Insert(contaCorrente, conta.Id);
+            return contaCorrente;
+
+        }
+        private Conta CreateConta(CreateContaRequestDTO requestDto)
+        {
+            var errors = new List<string>();
+
+            if (requestDto.AgenciaId <= 0)
+                errors.Add("ID da agência é obrigatório.");
+
+            if (!Enum.IsDefined(typeof(TipoConta), requestDto.TipoConta))
+                errors.Add("Tipo da conta é obrigatório.");
+
+            if (requestDto.ClienteId <= 0)
+                errors.Add("ID do cliente é obrigatório.");
+
+            if (errors.Any())
+                throw new ArgumentException(string.Join("\n", errors));
 
             var conta = new Conta
             {
@@ -65,13 +66,7 @@ namespace Malvader.Services
             };
 
             conta = _contaDao.Insert(conta);
-            if (conta == null)
-            {
-                errorResponse.Errors.Add("Não foi possível criar a conta");
-                return (null, errorResponse);
-            }
-
-            return (conta, null);
+            return conta;
         }
     }
 }

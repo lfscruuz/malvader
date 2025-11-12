@@ -1,4 +1,5 @@
 ﻿using Malvader.DTOs.RequestDTOs.Create;
+using Malvader.DTOs.ResponseDTOs.Read;
 using Malvader.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,15 @@ namespace Malvader.Controllers
             //var (conta, errorResponse) = _contaService.CreateConta(requestDto);
             //if (conta == null) return BadRequest(errorResponse);
 
-            return Ok(requestDto);
+            try
+            {
+                var conta = _contaService.CreateContaCorrente(requestDto);
+                return Created();
+            }
+            catch (Exception ex) 
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

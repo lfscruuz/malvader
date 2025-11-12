@@ -1,8 +1,8 @@
 ﻿using Malvader.Models;
 
-namespace Malvader.DTOs.ResponseDTOs.Create
+namespace Malvader.DTOs.ResponseDTOs.Read
 {
-    public class CreateContaResponseDTO
+    public class ReadContaResponseDTO
     {
         public int Id { get; set; }
         public string NumeroConta { get; set; }
