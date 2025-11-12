@@ -29,16 +29,26 @@ namespace Malvader.Controllers
         {
             try
             {
-                var responseDto = _authService.LoginHandler(request);
+                var loginData = _authService.LoginHandler(request);
 
-                switch (responseDto.TipoUsuario)
+                switch (loginData.TipoUsuario)
                 {
                     case TipoUsuario.CLIENTE:
-                        var clienteResponseDto = _usuarioService.GetClienteByUsuarioId(responseDto.Id);
-                        return Ok(clienteResponseDto);
+                        var clienteResponseDto = _usuarioService.GetClienteByUsuarioId(loginData.Id);
+                        var responseDto = new LoginResponseDTO
+                        {
+                            Token = _jwtService.GenerateToken(loginData.CPF),
+                            Response = clienteResponseDto
+                        };
+                        return Ok(responseDto);
                     case TipoUsuario.FUNCIONARIO:
-                        var funcionarioResponseDto = _usuarioService.GetFuncionarioByUsuarioId(responseDto.Id);
-                        return Ok(funcionarioResponseDto);
+                        var funcionarioResponseDto = _usuarioService.GetFuncionarioByUsuarioId(loginData.Id);
+                        responseDto = new LoginResponseDTO
+                        {
+                            Token = _jwtService.GenerateToken(loginData.CPF),
+                            Response = funcionarioResponseDto
+                        };
+                        return Ok(responseDto); ;
                     default:
                         return BadRequest();
                 }
