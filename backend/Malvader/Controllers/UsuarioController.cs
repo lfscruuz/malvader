@@ -40,27 +40,32 @@ namespace Malvader.Controllers
                   "senha": "123123",
                   "scoreCredito": 0
             }*/
-            var errors = new List<string>();
-            var (cliente, usuario, errorResponse) = _usuarioService.CreateCliente(requestDto, errors);
-            if (cliente == null) return BadRequest(errorResponse);
-
-            var usuarioResponseDto = new CreateUsuarioResponseDTO
+            try
             {
-                Nome = usuario.Nome,
-                CPF = usuario.CPF,
-                DataNascimento = usuario.DataNascimento,
-                Telefone = usuario.Telefone,
-                TipoUsuario = usuario.TipoUsuario
-            };
-            var clienteResponseDto = new CreateClienteResponseDTO
-            {
-                Id = cliente.Id,
-                Success = true,
-                Message = "Funcionário criado com sucesso!",
-                Usuario = usuarioResponseDto
-            };
+                var errors = new List<string>();
+                var (cliente, usuario, errorResponse) = _usuarioService.CreateCliente(requestDto, errors);
+                if (cliente == null) return BadRequest(errorResponse);
 
-            return Ok(clienteResponseDto);
+                var usuarioResponseDto = new CreateUsuarioResponseDTO
+                {
+                    Nome = usuario.Nome,
+                    CPF = usuario.CPF,
+                    DataNascimento = usuario.DataNascimento,
+                    Telefone = usuario.Telefone,
+                    TipoUsuario = usuario.TipoUsuario
+                };
+                var clienteResponseDto = new CreateClienteResponseDTO
+                {
+                    Id = cliente.Id,
+                    Success = true,
+                    Message = "Funcionário criado com sucesso!",
+                    Usuario = usuarioResponseDto
+                };
+
+                return Ok(clienteResponseDto);
+            } catch (Exception ex) {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("{id}")]

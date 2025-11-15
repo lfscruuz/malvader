@@ -3,6 +3,7 @@ using Malvader.DTOs.RequestDTOs.Read;
 using Malvader.DTOs.ResponseDTOs.Read;
 using Malvader.Models;
 using System.Security.Authentication;
+using System.Security.Policy;
 
 namespace Malvader.Services
 {
@@ -22,7 +23,7 @@ namespace Malvader.Services
             var errorResponse = new LoginErrorResponse();
             var usuario = _usuarioDao.GetByCpf(loginRequest.Cpf);
 
-            if (CheckPasswords(loginRequest, usuario) == false)
+            if (CheckPasswords(loginRequest.Senha, usuario.SenhaHash) == false)
             {
                 throw new AuthenticationException("CPF ou senha incorreto");
             }
@@ -38,10 +39,18 @@ namespace Malvader.Services
             };
             return usuarioResponseDto;
         }
-        private bool CheckPasswords(LoginRequestDTO loginRequest, Usuario usuario)
+        private bool CheckPasswords(string senhaLogin, string senhaUsuario)
         {
-            if (usuario.SenhaHash == loginRequest.Senha) return true;
+            if (HashMD5(senhaLogin) == senhaUsuario) return true;
             return false;
+        }
+
+        private string HashMD5(string input)
+        {
+            using var md5 = System.Security.Cryptography.MD5.Create();
+            var bytes = System.Text.Encoding.UTF8.GetBytes(input);
+            var hashBytes = md5.ComputeHash(bytes);
+            return Convert.ToHexString(hashBytes).ToLower();
         }
     }
 }

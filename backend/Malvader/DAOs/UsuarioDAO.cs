@@ -1,5 +1,6 @@
 ﻿using Malvader.Models;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Malvader.DAO
 {
@@ -32,8 +33,33 @@ namespace Malvader.DAO
 
             var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
             usuario.Id = insertedId;
-
+            UpdateSenhaHash(insertedId, usuario.SenhaHash);
             return usuario;
+        }
+
+        public void UpdateSenhaHash(int usuarioId, string senha)
+        {
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
+
+            using var cmd = new MySqlCommand("alterar_senha_usuario", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            // Input parameters
+            cmd.Parameters.AddWithValue("@p_id_usuario", usuarioId);
+            cmd.Parameters.AddWithValue("@p_senha_clara", senha);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine(ex.Number);
+                Console.WriteLine(ex.Message);
+                DeleteById(usuarioId);
+                throw new Exception(ex.Message);
+            }
         }
         public List<Usuario> ListarTodos()
         {
@@ -117,6 +143,18 @@ namespace Malvader.DAO
                 };
             }
             return null;
+        }
+
+        public void DeleteById(int id)
+        {
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
+
+            var sql = "DELETE FROM usuario WHERE id_usuario = @id";
+            using var cmd = new MySqlCommand(sql, conn);
+
+            cmd.Parameters.AddWithValue("@id", id);
+            cmd.ExecuteNonQuery();
         }
     }
 }

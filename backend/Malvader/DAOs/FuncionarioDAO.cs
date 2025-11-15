@@ -7,34 +7,44 @@ namespace Malvader.DAOs
     public class FuncionarioDAO
     {
         private readonly DbConnectionFactory _dbConnectionFactory;
+        private readonly UsuarioDAO _usuarioDao;
 
-        public FuncionarioDAO(DbConnectionFactory connectionFactory, UsuarioDAO suarioDao)
+        public FuncionarioDAO(DbConnectionFactory connectionFactory, UsuarioDAO usuarioDao)
         {
             _dbConnectionFactory = connectionFactory;
+            _usuarioDao = usuarioDao;
         }
 
         public Funcionario Insert(Funcionario funcionario) 
         {
-            using var conn = _dbConnectionFactory.CreateConnection();
-            conn.Open();
+            try
+            {
+                using var conn = _dbConnectionFactory.CreateConnection();
+                conn.Open();
 
-            string sql = @"
-                INSERT INTO funcionario (id_usuario, id_agencia, codigo_funcionario, cargo, id_Supervisor)
-                VALUES (@usuarioId, @agenciaId, @codigoFuncionario, @cargo, @supervisorId);
-                SELECT LAST_INSERT_ID();
-            ";
+                string sql = @"
+                    INSERT INTO funcionario (id_usuario, id_agencia, codigo_funcionario, cargo, id_Supervisor)
+                    VALUES (@usuarioId, @agenciaId, @codigoFuncionario, @cargo, @supervisorId);
+                    SELECT LAST_INSERT_ID();
+                ";
 
-            using var cmd = new MySqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@usuarioId", funcionario.UsuarioId);
-            cmd.Parameters.AddWithValue("@agenciaId", funcionario.AgenciaId);
-            cmd.Parameters.AddWithValue("@codigoFuncionario", funcionario.CodigoFuncionario);
-            cmd.Parameters.AddWithValue("@cargo", funcionario.Cargo.ToString());
-            cmd.Parameters.AddWithValue("@supervisorId", funcionario.SupervisorId);
+                using var cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@usuarioId", funcionario.UsuarioId);
+                cmd.Parameters.AddWithValue("@agenciaId", funcionario.AgenciaId);
+                cmd.Parameters.AddWithValue("@codigoFuncionario", funcionario.CodigoFuncionario);
+                cmd.Parameters.AddWithValue("@cargo", funcionario.Cargo.ToString());
+                cmd.Parameters.AddWithValue("@supervisorId", funcionario.SupervisorId);
 
-            var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
-            funcionario.Id = insertedId;
+                var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
+                funcionario.Id = insertedId;
 
-            return funcionario;
+                return funcionario;
+            }
+            catch (Exception ex)
+            {
+                _usuarioDao.DeleteById(funcionario.UsuarioId);
+                throw;
+            }
         }
 
         public Funcionario? GetById(int id)

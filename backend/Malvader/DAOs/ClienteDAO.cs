@@ -7,31 +7,41 @@ namespace Malvader.DAOs
     public class ClienteDAO
     {
         private readonly DbConnectionFactory _dbConnectionFactory;
+        private readonly UsuarioDAO _usuarioDao;
 
-        public ClienteDAO(DbConnectionFactory connectionFactory, UsuarioDAO usarioDao)
+        public ClienteDAO(DbConnectionFactory connectionFactory, UsuarioDAO usuarioDao)
         {
             _dbConnectionFactory = connectionFactory;
+            _usuarioDao = usuarioDao;
         }
 
         public Cliente Insert(Cliente cliente) 
         {
-            using var conn = _dbConnectionFactory.CreateConnection();
-            conn.Open();
+            try
+            {
+                using var conn = _dbConnectionFactory.CreateConnection();
+                conn.Open();
 
-            string sql = @"
-                INSERT INTO cliente (id_usuario, score_credito)
-                VALUES (@usuarioId, @scoreCredito);
-                SELECT LAST_INSERT_ID();
-            ";
+                string sql = @"
+                    INSERT INTO cliente (id_usuario, score_credito)
+                    VALUES (@usuarioId, @scoreCredito);
+                    SELECT LAST_INSERT_ID();
+                ";
 
-            using var cmd = new MySqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@usuarioId", cliente.UsuarioId);
-            cmd.Parameters.AddWithValue("@scoreCredito", cliente.ScoreCredito);
+                using var cmd = new MySqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@usuarioId", cliente.UsuarioId);
+                cmd.Parameters.AddWithValue("@scoreCredito", cliente.ScoreCredito);
 
-            var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
-            cliente.Id = insertedId;
+                var insertedId = Convert.ToInt32(cmd.ExecuteScalar());
+                cliente.Id = insertedId;
 
-            return cliente;
+                return cliente;
+            }
+            catch (Exception ex)
+            {
+                _usuarioDao.DeleteById(cliente.UsuarioId);
+                throw;
+            }
         }
 
         public Cliente? GetById(int id)
