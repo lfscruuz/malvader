@@ -37,7 +37,7 @@ namespace Malvader.Controllers
                         var clienteResponseDto = _usuarioService.GetClienteByUsuarioId(loginData.Id);
                         var responseDto = new LoginResponseDTO
                         {
-                            Token = _jwtService.GenerateToken(loginData.CPF),
+                            Token = _jwtService.GenerateToken(clienteResponseDto.Id.ToString()),
                             Response = clienteResponseDto
                         };
                         return Ok(responseDto);
@@ -45,7 +45,7 @@ namespace Malvader.Controllers
                         var funcionarioResponseDto = _usuarioService.GetFuncionarioByUsuarioId(loginData.Id);
                         responseDto = new LoginResponseDTO
                         {
-                            Token = _jwtService.GenerateToken(loginData.CPF),
+                            Token = _jwtService.GenerateToken(funcionarioResponseDto.Id.ToString()),
                             Response = funcionarioResponseDto
                         };
                         return Ok(responseDto); ;

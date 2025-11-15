@@ -63,7 +63,27 @@ namespace Malvader.DAOs
                 };
             }
 
-            return null;
+            throw new Exception("ID da conta não encontrado");
+        }
+
+        public int GetContaIdByNumeroConta (string numero)
+        {
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM conta WHERE numero_conta = @numero
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@numero", numero);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return reader.GetInt32("id_conta");
+            }
+            throw new KeyNotFoundException("Número da conta não encontrado");
         }
     }
 }

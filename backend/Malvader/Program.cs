@@ -18,10 +18,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton(new DbConnectionFactory(connectionString));
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<AgenciaService>();
 builder.Services.AddScoped<ContaService>();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<TransacaoService>();
 
 //DAOs
 builder.Services.AddScoped<UsuarioDAO>();
@@ -33,6 +34,7 @@ builder.Services.AddScoped<ContaDAO>();
 builder.Services.AddScoped<ContaCorrenteDAO>();
 builder.Services.AddScoped<ContaInvestimentoDAO>();
 builder.Services.AddScoped<ContaPoupancaDAO>();
+builder.Services.AddScoped<TransacaoDAO>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(o =>
