@@ -36,7 +36,7 @@ namespace Malvader.DAOs
             return conta;
         }
 
-        public Conta? GetById(int id)
+        public Conta GetById(int id)
         {
             using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
@@ -53,14 +53,14 @@ namespace Malvader.DAOs
             {
                 return new Conta
                 {
-                    Id = reader.GetInt32("id_usuario"),
+                    Id = reader.GetInt32("id_conta"),
                     NumeroConta = reader.GetString("numero_conta"),
                     AgenciaId = reader.GetInt32("id_agencia"),
                     Saldo = reader.GetDecimal("saldo"),
                     TipoConta = Enum.Parse<TipoConta>(reader.GetString("tipo_conta")),
                     ClienteId = reader.GetInt32("id_cliente"),
                     DataAbertura = reader.GetDateTime("data_abertura"),
-                    StatusConta = Enum.Parse<StatusConta>(reader.GetString("status_conta"))
+                    StatusConta = Enum.Parse<StatusConta>(reader.GetString("status"))
                 };
             }
 

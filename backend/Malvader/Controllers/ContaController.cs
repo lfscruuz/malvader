@@ -1,11 +1,13 @@
 ﻿using Malvader.DTOs.RequestDTOs.Create;
 using Malvader.DTOs.RequestDTOs.Delete;
+using Malvader.DTOs.RequestDTOs.Read;
 using Malvader.DTOs.ResponseDTOs.Delete;
 using Malvader.DTOs.ResponseDTOs.Read;
 using Malvader.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Mysqlx.Crud;
 using System.Security.Policy;
 
 namespace Malvader.Controllers
@@ -29,16 +31,8 @@ namespace Malvader.Controllers
         [Authorize]
         public IActionResult DeleteConta([FromBody] DeleteContaRequestDTO requestDto)
         {
-            //  curl - X 'DELETE' \
-            //  'https://localhost:7108/api/conta' \
-            //  -H 'accept: */*' \
-            //  -H 'Content-Type: application/json' \
-            //  -H "Authorization: Bearer <TOKEN>" \
-            //  -d '{
-            //  "numeroConta": "0040001125111520408",
-            //  "motivo": "cansei",
-            //  "senha": "#Abcd1234"
-            //}'
+            //curl - X DELETE "https://localhost:7108/api/conta" - H "accept: */*" - H "Content-Type: application/json" - H "Authorization: Bearer YOUR_TOKEN_HERE" - d "{\"numeroConta\": \"0040001125111520408\", \"motivo\": \"cansei\", \"senha\": \"#Abcd1234\"}"
+
             try
             {
                 //pega cpf do jwt e verifica se senha bate
@@ -61,6 +55,28 @@ namespace Malvader.Controllers
                     Message = ex.Message,
                 };
                 return BadRequest(responseDto);
+            }
+        }
+
+        [HttpPost("extrato")]
+        [Authorize]
+        public IActionResult Extrato([FromBody] ReadExtratoRequestDTO requestDto)
+        {
+            try
+            {
+                var extrato = _contaService.GetExtrato(requestDto);
+                var responseDto = new ReadExtratoResponseDTO
+                {
+                    NumeroConta = extrato.NumeroConta,
+                    SaldoAtual = extrato.SaldoAtual,
+                    DataGeracao = extrato.DataGeracao,
+                    Transacoes = extrato.Transacoes
+                };
+                return Ok(responseDto);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

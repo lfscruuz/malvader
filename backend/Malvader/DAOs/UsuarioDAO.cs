@@ -114,7 +114,7 @@ namespace Malvader.DAO
             return null;
         }
 
-        public Usuario? GetByCpf(string cpf) {
+        public Usuario GetByCpf(string cpf) {
             using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
 
@@ -139,7 +139,7 @@ namespace Malvader.DAO
                     SenhaHash = reader.GetString("senha_hash")
                 };
             }
-            return null;
+            throw new Exception("usuario não encontrado com o CPF");
         }
 
         public void DeleteById(int id)

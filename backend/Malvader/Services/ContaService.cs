@@ -2,6 +2,7 @@
 using Malvader.DAOs;
 using Malvader.DTOs.RequestDTOs.Create;
 using Malvader.DTOs.RequestDTOs.Delete;
+using Malvader.DTOs.RequestDTOs.Read;
 using Malvader.Models;
 
 namespace Malvader.Services
@@ -12,17 +13,20 @@ namespace Malvader.Services
         private readonly ContaCorrenteDAO _contaCorrenteDao;
         private readonly ContaInvestimentoDAO _contaInvestimentoDao;
         private readonly ContaPoupancaDAO _contaPoupancaDao;
+        private readonly TransacaoDAO _transacaoDao;
 
         public ContaService(
             ContaDAO contaDao,
             ContaCorrenteDAO contaCorrenteDao,
             ContaInvestimentoDAO contaInvestimentoDao,
-            ContaPoupancaDAO contaPoupancaDao)
+            ContaPoupancaDAO contaPoupancaDao,
+            TransacaoDAO transacaoDao)
         {
             _contaDao = contaDao;
             _contaCorrenteDao = contaCorrenteDao;
             _contaInvestimentoDao = contaInvestimentoDao;
             _contaPoupancaDao = contaPoupancaDao;
+            _transacaoDao = transacaoDao;
         }
 
         public ContaCorrente CreateContaCorrente(CreateContaCorrenteRequestDTO requestDto)
@@ -119,6 +123,30 @@ namespace Malvader.Services
 
             conta = _contaDao.Insert(conta);
             return conta;
+        }
+
+        public Extrato GetExtrato(ReadExtratoRequestDTO requestDto)
+        {
+            var contaId = _contaDao.GetContaIdByNumeroConta(requestDto.NumeroConta);
+            var conta = _contaDao.GetById(contaId);
+            var transacoes = new List<Transacao>();
+
+            if (requestDto.DataInicio != null)
+            {
+                transacoes = _transacaoDao.GetExtrato(contaId, requestDto.Limite, requestDto.DataInicio, requestDto.DataFim);
+            } else
+            {
+                transacoes = _transacaoDao.GetExtrato(contaId, requestDto.Limite);
+            }
+
+            var extrato = new Extrato
+            {
+                NumeroConta = requestDto.NumeroConta,
+                SaldoAtual = conta.Saldo,
+                Transacoes = transacoes
+            };
+
+            return extrato;
         }
 
         public void DeleteConta(DeleteContaRequestDTO requestDto, string cpf)
