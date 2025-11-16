@@ -3,6 +3,7 @@ using Malvader.DTOs.RequestDTOs.Create;
 using Malvader.DTOs.ResponseDTOs.Create;
 using Malvader.DTOs.ResponseDTOs.Read;
 using Malvader.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 
@@ -54,7 +55,21 @@ namespace Malvader.Controllers
             }
             catch (ArgumentException ex) 
             { 
-                return BadRequest(ex.Message);
+                return BadRequest(new { Success = false, Message = ex.Message });
+            }
+        }
+        [HttpGet]
+        [Authorize]
+        public IActionResult GetAcencias()
+        {
+            try
+            {
+                var agencias = _agenciaService.GetAllAgencias();
+                return Ok(agencias);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Sucess = false, Message = ex.Message });
             }
         }
         [HttpGet("{id}")]
@@ -86,7 +101,7 @@ namespace Malvader.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Success = false, Message = ex.Message });
             }
         }
     }

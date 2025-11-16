@@ -12,57 +12,43 @@ namespace Malvader.Services
         private readonly UsuarioDAO _usuarioDao;
         private readonly ClienteDAO _clienteDao;
         private readonly FuncionarioDAO _funcionarioDao;
+        private readonly AgenciaService _agenciaService;
 
-        public UsuarioService(UsuarioDAO usuarioDao, ClienteDAO clienteDao, FuncionarioDAO funcionario)
+        public UsuarioService(UsuarioDAO usuarioDao, ClienteDAO clienteDao, FuncionarioDAO funcionario, AgenciaService agenciaService)
         {
             _usuarioDao = usuarioDao;
             _clienteDao = clienteDao;
             _funcionarioDao = funcionario;
+            _agenciaService = agenciaService;
         }
         #region Public Methods
         #region Inserts
-        public (Cliente? cliente, Usuario? usuario, ErrorResponse? errorResponse) CreateCliente(
-            CreateClienteRequestDTO requestDto,
-            List<string> errors)
+        public (Cliente cliente, Usuario usuario ) CreateCliente(CreateClienteRequestDTO requestDto)
         {
             var usuario = CreateUsuario(requestDto);
-            if (usuario == null) return (null, null, new ErrorResponse { Errors = errors });
 
             if (string.IsNullOrEmpty(usuario?.Id.ToString()))
             {
-                errors.Add("Insira o id do usuário");
-            }
-            if (string.IsNullOrEmpty(requestDto.ScoreCredito.ToString()))
-            {
-                errors.Add("Insira o score");
-            }
-
-            if (errors.Any())
-            {
-                throw new ArgumentException(string.Join("\n", errors));
+                throw new ArgumentException("Insira o id do usuário");
             }
 
             var novoCliente = new Cliente
             {
-                UsuarioId = usuario.Id,
-                ScoreCredito = requestDto.ScoreCredito != 0 ? requestDto.ScoreCredito : 0,
+                UsuarioId = usuario.Id
             };
             novoCliente = _clienteDao.Insert(novoCliente);
-            return (novoCliente, usuario, null);
+            return (novoCliente, usuario);
         }
-        public (Funcionario? funcionario, Usuario? usuario) CreateFuncionario(
+        public (Funcionario funcionario, Usuario usuario) CreateFuncionario(
             CreateFuncionarioRequestDTO requestDto)
         {
             var errors = new List<string>();
             var usuario = CreateUsuario(requestDto);
+            var (agencia, _) = _agenciaService.GetAgenciaIdByCodigo(requestDto.CodigoAgencia);
 
-            if (string.IsNullOrEmpty(usuario?.Id.ToString()))
+            if (string.IsNullOrEmpty(requestDto.CodigoAgencia))
             {
-                errors.Add("Insira o id do usuário");
-            }
-            if (string.IsNullOrEmpty(requestDto.AgenciaId.ToString()))
-            {
-                errors.Add("Insira o id da agencia");
+                errors.Add("Insira o código da agencia");
             }
             if (string.IsNullOrEmpty(requestDto.Cargo.ToString()))
             {
@@ -77,11 +63,16 @@ namespace Malvader.Services
             var novoFuncionario = new Funcionario
             {
                 UsuarioId = usuario.Id,
-                AgenciaId = requestDto.AgenciaId,
+                AgenciaId = agencia.Id,
                 Cargo = Enum.Parse<Cargo>(requestDto.Cargo.ToString()),
-                SupervisorId = requestDto.SupervisorId,
                 CodigoFuncionario = requestDto.CodigoFuncionario
             };
+            
+            if (requestDto.CodigoSupervisor != null)
+            {
+                var supervisor = _funcionarioDao.GetByCodigo(requestDto.CodigoSupervisor);
+                novoFuncionario.SupervisorId = supervisor.Id;
+            }
 
             novoFuncionario = _funcionarioDao.Insert(novoFuncionario);
             return (novoFuncionario, usuario);

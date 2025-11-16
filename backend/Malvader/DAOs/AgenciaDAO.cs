@@ -34,7 +34,7 @@ namespace Malvader.DAOs
 
             return agencia;
         }
-        public Agencia? GetById(int id)
+        public Agencia GetById(int id)
         {
             using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
@@ -58,7 +58,61 @@ namespace Malvader.DAOs
                 };
             }
 
-            return null;
+            throw new KeyNotFoundException("Agencia não foi encontrada");
+        }
+
+        public Agencia GetByCodigo(string codigo)
+        {
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM agencia WHERE codigo_agencia = @codigo
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@codigo", codigo);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Agencia
+                {
+                    Id = reader.GetInt32("id_agencia"),
+                    Nome = reader.GetString("nome"),
+                    CodigoAgencia = reader.GetString("codigo_agencia"),
+                    EnderecoAgenciaId = reader.GetInt32("endereco_id")
+                };
+            }
+            throw new KeyNotFoundException("Agencia não foi encontrada");
+        }
+
+        public List<Agencia> GetAll()
+        {
+            var agencias = new List<Agencia>();
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM agencia
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                var agencia = new Agencia
+                {
+                    Id = reader.GetInt32("id_agencia"),
+                    Nome = reader.GetString("nome"),
+                    CodigoAgencia = reader.GetString("codigo_agencia"),
+                    EnderecoAgenciaId = reader.GetInt32("endereco_id")
+                };
+                agencias.Add(agencia);
+                
+            }
+            throw new KeyNotFoundException("Erro na busca por agências");
         }
     }
 }

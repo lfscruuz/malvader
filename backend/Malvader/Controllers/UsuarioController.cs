@@ -42,9 +42,7 @@ namespace Malvader.Controllers
             }*/
             try
             {
-                var errors = new List<string>();
-                var (cliente, usuario, errorResponse) = _usuarioService.CreateCliente(requestDto, errors);
-                if (cliente == null) return BadRequest(errorResponse);
+                var (cliente, usuario ) = _usuarioService.CreateCliente(requestDto);
 
                 var usuarioResponseDto = new CreateUsuarioResponseDTO
                 {
@@ -64,7 +62,7 @@ namespace Malvader.Controllers
 
                 return Ok(clienteResponseDto);
             } catch (Exception ex) {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Success = false, Message = ex.Message });
             }
         }
 
@@ -95,7 +93,7 @@ namespace Malvader.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Success = false, Message = ex.Message });
             }
         }
     }
@@ -146,7 +144,7 @@ namespace Malvader.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Success = false, Message = ex.Message });
             }
         }
 
@@ -176,7 +174,7 @@ namespace Malvader.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Success = false, Message = ex.Message });
             }
         }
     }

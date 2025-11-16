@@ -1,6 +1,7 @@
 ﻿using Malvader.Models;
 using MySql.Data.MySqlClient;
 using System.Data;
+using System.Security.Authentication;
 
 namespace Malvader.DAO
 {
@@ -139,7 +140,7 @@ namespace Malvader.DAO
                     SenhaHash = reader.GetString("senha_hash")
                 };
             }
-            throw new Exception("usuario não encontrado com o CPF");
+            throw new AuthenticationException("CPF ou senha incorreto");
         }
 
         public void DeleteById(int id)

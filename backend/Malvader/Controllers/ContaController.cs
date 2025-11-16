@@ -54,7 +54,7 @@ namespace Malvader.Controllers
                     Success = false,
                     Message = ex.Message,
                 };
-                return BadRequest(responseDto);
+                return BadRequest(new { Success = false, Message = ex.Message });
             }
         }
 
@@ -76,7 +76,7 @@ namespace Malvader.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Success = false, Message = ex.Message });
             }
         }
     }
@@ -99,7 +99,7 @@ namespace Malvader.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Success = false, Message = ex.Message });
             }
         }
     }
@@ -123,7 +123,7 @@ namespace Malvader.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Success = false, Message = ex.Message });
             }
         }
     }
@@ -147,7 +147,7 @@ namespace Malvader.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { Success = false, Message = ex.Message });
             }
         }
     }

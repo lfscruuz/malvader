@@ -1,8 +1,13 @@
-﻿namespace Malvader.DTOs.ResponseDTOs.Read
+﻿using Malvader.Models;
+
+namespace Malvader.DTOs.ResponseDTOs.Read
 {
     public class LoginResponseDTO
     {
-        public string Token { get; set; }
-        public Object Response { get; set; } 
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public string? Token { get; set; }
+        public TipoUsuario? TipoUsuario { get; set; }
+        public object? Data { get; set; }
     }
 }

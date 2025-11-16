@@ -37,8 +37,11 @@ namespace Malvader.Controllers
                         var clienteResponseDto = _usuarioService.GetClienteByUsuarioId(loginData.Id);
                         var responseDto = new LoginResponseDTO
                         {
+                            Success = true,
+                            Message = "Login realizado",    
                             Token = _jwtService.GenerateToken(loginData.CPF),
-                            Response = clienteResponseDto
+                            TipoUsuario = TipoUsuario.CLIENTE,
+                            Data = clienteResponseDto
                         };
                         return Ok(responseDto);
                     case TipoUsuario.FUNCIONARIO:
@@ -46,20 +49,42 @@ namespace Malvader.Controllers
                         responseDto = new LoginResponseDTO
                         {
                             Token = _jwtService.GenerateToken(loginData.CPF),
-                            Response = funcionarioResponseDto
+                            TipoUsuario = TipoUsuario.FUNCIONARIO,
+                            Data = funcionarioResponseDto
                         };
                         return Ok(responseDto); ;
                     default:
-                        return BadRequest();
+                        return BadRequest(new LoginResponseDTO
+                        {
+                            Success = false,
+                            Message = "erro",
+                            Token = null,
+                            TipoUsuario = null,
+                            Data = null
+                        });
                 }
             }
             catch (AuthenticationException ex)
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized(new LoginResponseDTO
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Token = null,
+                    TipoUsuario = null,
+                    Data = null
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new LoginResponseDTO
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Token = null,
+                    TipoUsuario = null,
+                    Data = null
+                });
             }
         }
     }

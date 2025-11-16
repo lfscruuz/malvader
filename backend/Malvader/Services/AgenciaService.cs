@@ -15,7 +15,7 @@ namespace Malvader.Services
             _enderecoAgenciaDao = enderecoAgenciaDao;
         }
 
-        public (Agencia? agencia, EnderecoAgencia? endereco) CreateAgencia(CreateAgenciaRequestDTO requestDto)
+        public (Agencia agencia, EnderecoAgencia endereco) CreateAgencia(CreateAgenciaRequestDTO requestDto)
         {
             var enderecoAgencia = CreateEnderecoAgencia(requestDto);
             var errors = new List<string>();
@@ -36,13 +36,25 @@ namespace Malvader.Services
             return (novaAgencia, enderecoAgencia);
         }
 
-        public (Agencia? agencia, EnderecoAgencia? enderecoAgencia) GetById(int id)
+        public (Agencia agencia, EnderecoAgencia enderecoAgencia) GetById(int id)
         {
             var agencia = _agenciaDao.GetById(id);
             var enderecoAgencia = GetEnderecoAgenciaById(agencia.EnderecoAgenciaId);
             return (agencia, enderecoAgencia);
         }
 
+        public (Agencia, EnderecoAgencia) GetAgenciaIdByCodigo(string codigo)
+        {
+            var agencia = _agenciaDao.GetByCodigo(codigo);
+            var enderecoAgencia = GetEnderecoAgenciaById(agencia.EnderecoAgenciaId);
+            return (agencia, enderecoAgencia);
+        }
+        public List<Agencia> GetAllAgencias()
+        {
+            var agencias = _agenciaDao.GetAll();
+            return agencias;
+        }
+        
         #region Private Methods
         private EnderecoAgencia CreateEnderecoAgencia(CreateAgenciaRequestDTO requestDto)
         {

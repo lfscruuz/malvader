@@ -47,7 +47,7 @@ namespace Malvader.DAOs
             }
         }
 
-        public Funcionario? GetById(int id)
+        public Funcionario GetById(int id)
         {
             using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
@@ -73,11 +73,10 @@ namespace Malvader.DAOs
                 };
             }
 
-            return null;
+            throw new Exception("Funcionário não encontrado pelo ID informado");
         }
-        public Funcionario? GetByUsuarioId(int id)
+        public Funcionario GetByUsuarioId(int id)
         {
-            Console.WriteLine(id);
             using var conn = _dbConnectionFactory.CreateConnection();
             conn.Open();
 
@@ -102,7 +101,36 @@ namespace Malvader.DAOs
                 };
             }
 
-            return null;
+            throw new Exception("Funcionário não encontrado pelo ID de usuário informado");
+        }
+
+        public Funcionario GetByCodigo(string codigo)
+        {
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
+
+            string sql = @"
+                SELECT * FROM funcionario WHERE codigo_funcionario = @codigo
+            ";
+
+            using var cmd = new MySqlCommand(sql, conn);
+            cmd.Parameters.AddWithValue("@codigo", codigo);
+
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Funcionario
+                {
+                    Id = reader.GetInt32("id_funcionario"),
+                    UsuarioId = reader.GetInt32("id_usuario"),
+                    AgenciaId = reader.GetInt32("id_agencia"),
+                    CodigoFuncionario = reader.GetString("codigo_funcionario"),
+                    Cargo = Enum.Parse<Cargo>(reader.GetString("cargo")),
+                    SupervisorId = reader.IsDBNull(reader.GetOrdinal("id_supervisor")) ? null : reader.GetInt32("id_supervisor")
+                };
+            }
+
+            throw new Exception("Funcionário não encontrado pelo ID de usuário informado");
         }
     }
 }
