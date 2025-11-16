@@ -1,5 +1,7 @@
-﻿using Malvader.DAOs;
+﻿using Malvader.DAO;
+using Malvader.DAOs;
 using Malvader.DTOs.RequestDTOs.Create;
+using Malvader.DTOs.RequestDTOs.Delete;
 using Malvader.Models;
 
 namespace Malvader.Services
@@ -117,6 +119,12 @@ namespace Malvader.Services
 
             conta = _contaDao.Insert(conta);
             return conta;
+        }
+
+        public void DeleteConta(DeleteContaRequestDTO requestDto, string cpf)
+        {
+            var contaId = _contaDao.GetContaIdByNumeroConta(requestDto.NumeroConta);
+            _contaDao.CloseContaById(contaId, requestDto.Motivo);
         }
     }
 }

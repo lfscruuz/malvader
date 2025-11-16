@@ -23,10 +23,7 @@ namespace Malvader.Services
             var errorResponse = new LoginErrorResponse();
             var usuario = _usuarioDao.GetByCpf(loginRequest.Cpf);
 
-            if (CheckPasswords(loginRequest.Senha, usuario.SenhaHash) == false)
-            {
-                throw new AuthenticationException("CPF ou senha incorreto");
-            }
+            CheckPasswords(loginRequest.Senha, usuario.SenhaHash);
 
             var usuarioResponseDto = new ReadUsuarioResponseDTO
             {
@@ -39,10 +36,9 @@ namespace Malvader.Services
             };
             return usuarioResponseDto;
         }
-        private bool CheckPasswords(string senhaLogin, string senhaUsuario)
+        public void CheckPasswords(string senhaLogin, string senhaUsuario)
         {
-            if (HashMD5(senhaLogin) == senhaUsuario) return true;
-            return false;
+            if (HashMD5(senhaLogin) != senhaUsuario) throw new AuthenticationException("CPF ou senha incorreto");
         }
 
         private string HashMD5(string input)
@@ -51,6 +47,12 @@ namespace Malvader.Services
             var bytes = System.Text.Encoding.UTF8.GetBytes(input);
             var hashBytes = md5.ComputeHash(bytes);
             return Convert.ToHexString(hashBytes).ToLower();
+        }
+
+        public void CheckCPFandSenha(string cpf, string senha)
+        {
+            var usuario = _usuarioService.GetUsuarioByCpf(cpf);
+            CheckPasswords(senha, usuario.SenhaHash);
         }
     }
 }

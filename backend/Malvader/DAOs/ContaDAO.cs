@@ -1,5 +1,6 @@
 ﻿using Malvader.Models;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Malvader.DAOs
 {
@@ -84,6 +85,28 @@ namespace Malvader.DAOs
                 return reader.GetInt32("id_conta");
             }
             throw new KeyNotFoundException("Número da conta não encontrado");
+        }
+
+        public void CloseContaById(int contaId, string motivo)
+        {
+            using var conn = _dbConnectionFactory.CreateConnection();
+            conn.Open();
+
+            using var cmd = new MySqlCommand("encerrar_conta", conn);
+            cmd.CommandType = CommandType.StoredProcedure;
+
+            cmd.Parameters.AddWithValue("@p_id_conta", contaId);
+            cmd.Parameters.AddWithValue("@p_motivo", motivo);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (MySqlException ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
         }
     }
 }

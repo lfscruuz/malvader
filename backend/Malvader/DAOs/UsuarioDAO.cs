@@ -45,7 +45,6 @@ namespace Malvader.DAO
             using var cmd = new MySqlCommand("alterar_senha_usuario", conn);
             cmd.CommandType = CommandType.StoredProcedure;
 
-            // Input parameters
             cmd.Parameters.AddWithValue("@p_id_usuario", usuarioId);
             cmd.Parameters.AddWithValue("@p_senha_clara", senha);
 
@@ -55,8 +54,6 @@ namespace Malvader.DAO
             }
             catch (MySqlException ex)
             {
-                Console.WriteLine(ex.Number);
-                Console.WriteLine(ex.Message);
                 DeleteById(usuarioId);
                 throw new Exception(ex.Message);
             }

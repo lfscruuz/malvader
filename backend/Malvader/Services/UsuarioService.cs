@@ -131,6 +131,12 @@ namespace Malvader.Services
 
             return (funcionario, usuario);
         }
+
+        public Usuario GetUsuarioByCpf(string cpf)
+        {
+            var usuario = _usuarioDao.GetByCpf(cpf);
+            return usuario;
+        }
         #endregion
         #endregion
 

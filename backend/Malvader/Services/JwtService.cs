@@ -14,14 +14,14 @@ namespace Malvader.Services
             _config = config;
         }
 
-        public string GenerateToken(string username)
+        public string GenerateToken(string cpf)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, username)
+                new Claim("cpf", cpf)
             };
 
             var token = new JwtSecurityToken(
