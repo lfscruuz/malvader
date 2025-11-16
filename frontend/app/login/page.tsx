@@ -1,6 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { apiFetch } from '../api';
+import { LoginRequest, LoginResponse } from '@/types/auth';
+import Link from 'next/link';
 
 export default function Login() {
   const [cpf, setCpf] = useState("");
@@ -9,19 +11,22 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
-      const data = await apiFetch("auth/login", {
+      const payload: LoginRequest = { cpf, senha };
+      const res: LoginResponse = await apiFetch("auth/login", {
         method: "POST",
-        body: JSON.stringify({ cpf, senha }),
+        body: JSON.stringify(payload),
       });
 
-      if (data.success) {
-        setMessage("");
-      } else {
-        setMessage(data.message);
+      if (!res.success) {
+        setMessage(res.message);
+        return;
       }
+      
+      localStorage.setItem("jwt", res.token!);
     } catch (err) {
-      setMessage("Houve algum erro, por favor tente novamente.");
+      setMessage("Um erro ocorreu. Por favor, tente novamente.");
       console.error(err);
     }
   };
@@ -65,20 +70,22 @@ export default function Login() {
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               required
-              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
+              className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition"
           >
             Login
           </button>
         </form>
         <div className="mt-4 text-center">
-          <button onClick={handleRegister} className="text-blue-600 hover:underline">
-            Registrar
-          </button>
+          <Link href="/signin">
+            <button onClick={handleRegister} className="text-blue-600 hover:underline">
+              Registrar
+            </button>
+          </Link>
         </div>
       </div>
     </div>
